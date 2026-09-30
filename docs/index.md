@@ -1,11 +1,11 @@
 # GN 闪光曝光计算器
 
-![Version](https://img.shields.io/badge/Version-1.3.0-blue)
+![Version](https://img.shields.io/badge/Version-1.4.0-blue)
 ![Platform](https://img.shields.io/badge/Platform-Android%2016%20(API%2036)-3DDC84?logo=android)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.4.20-7F52FF?logo=kotlin)
 ![Compose](https://img.shields.io/badge/UI-Jetpack%20Compose%20%2B%20Material%203-4285F4?logo=jetpackcompose)
 ![AGP](https://img.shields.io/badge/AGP-9.4.1-02303A?logo=gradle)
-![Tests](https://img.shields.io/badge/Unit%20Tests-8%2F8%20passing-brightgreen)
+![Font](https://img.shields.io/badge/Font-IBM%20Plex%20Sans%20%2B%20%E6%80%9D%E6%BA%90%E5%AE%8B%E4%BD%93-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 > 面向 **Android 16（API 36）** 的原生闪光灯曝光计算工具。输入闪光灯 GN、光圈、ISO 与拍摄距离，
@@ -31,13 +31,14 @@
 - 光圈 — 距离对照表
 - 米 / 英尺一键切换（GN 与距离同步换算）
 
-### 玻璃视觉风格（v1.3.0）
+### 字体（v1.4.0）
 
-- **毛玻璃 Frosted**：真实背景采样 + 22dp 模糊 + 磨砂渐变底色，边界极淡，可读性优先
-- **液态玻璃 Liquid**：30dp 模糊 + 饱和度提升 + 镜面高光 + 折射描边 + 内阴影 + 3dp 投影
-- 两者均为**真实 backdrop blur**（`RenderEffect`），非"半透明渐变"伪装
-- API 31 以下自动降级为半透明玻璃，不崩溃、不空白
-- 详见 [玻璃视觉设计文档](glass-design.md)
+- **拉丁字母与数字**：IBM Plex Sans
+- **中文**：思源宋体（Source Han Serif / Noto Serif SC）
+- 两者**按字重合并进同一个字体文件**：Compose 的 `FontFamily` 回退链在多数设备上按列表顺序取字形，
+  若中西文分拆为两个字体，中文会永远落到同一个字重，粗细区分就失效了
+- 字重分配：**大标题与结果数字用粗体（700）**，**小标题用细体（300）**，正文常规（400），按钮与标签中等（500）
+- 字符按应用实际用到的文案做子集（中文 518 字 + 拉丁/符号 304 个），每字重约 214 KB
 
 ### 闪光灯档案（v1.2.0）
 
@@ -46,14 +47,14 @@
 - 内置 GN 24 / GN 36 / GN 60 默认档案
 - 设置页支持增、改、删，数据经 DataStore 本地持久化
 
-### 设置与个性化（v1.1.0）
+### 设置与个性化（v1.1.0 / v1.4.0）
 
 - 底部导航栏：四个计算目标一键切换
-- 语言：跟随系统 / 简体中文 / English（无需重启）
+- 语言：跟随系统 / 简体中文 / **繁体中文** / English（v1.4.0 新增，无需重启）
 - 字号：跟随系统 / 紧凑 90% / 大号 115%
-- 视觉风格：标准 Material 3 / 毛玻璃 / 液态玻璃
-- 配色预设（关闭动态取色时）：Amber / Ocean / Mint / Rose，均支持明暗模式
 - 主题：浅色 / 深色 / 跟随系统，动态取色 Material You
+- 配色预设（关闭动态取色时）：Amber / Ocean / Mint / Rose，均支持明暗模式
+- **外观设置仅保留配色**（v1.4.0 移除了毛玻璃 / 液态玻璃选项）
 
 ## Android 16 适配
 
@@ -69,20 +70,20 @@
 
 ## 下载安装
 
-从仓库的 **Releases** 页面下载最新版本 **v1.3.0**：
+从仓库的 **Releases** 页面下载最新版本 **v1.4.0**：
 
 | 文件 | 大小 | 说明 |
 | --- | --- | --- |
-| `GNCal-v1.3.0-release.apk` | 7.38 MB | 侧载安装用，V2 + V3 签名（含 v4 `.idsig`） |
-| `GNCal-v1.3.0-release.aab` | 约 19 MB | 含 code transparency 的 App Bundle |
+| `GNCal-v1.4.0-release.apk` | 7.90 MB | 侧载安装用，V2 + V3 签名（含 v4 `.idsig`） |
+| `GNCal-v1.4.0-release.aab` | 19.93 MB | 含 code transparency 的 App Bundle |
 | `transparency.cert` | < 1 KB | 代码透明度公钥证书，供独立校验 |
 
 ```
-APK SHA-256: 06A2FCAEE3F2B7ED29FC7F030B6A49C74EA7EC930F1C6E1676260C3CB09C08AA
+APK SHA-256: A71C6E2786DA620004653B8C4103AF488D3AD4441B90803BEF3A33E09AAA356E
 ```
 
 ```powershell
-adb install -r GNCal-v1.3.0-release.apk
+adb install -r GNCal-v1.4.0-release.apk
 ```
 
 | 项目 | 值 |
@@ -92,9 +93,9 @@ adb install -r GNCal-v1.3.0-release.apk
 | targetSdkVersion | **36（Android 16）** |
 | 权限 | **无（零权限）** |
 | 签名证书 SHA-256 | `9493CBED…40EB458DB`（RSA 2048，永久固定） |
-| 历史版本 | v1.0.0（7.33 MB）、v1.1.0（7.36 MB）、v1.2.0（7.36 MB） |
+| 历史版本 | v1.0.0（7.33 MB）、v1.1.0（7.36 MB）、v1.2.0（7.36 MB）、v1.3.0（7.38 MB） |
 
-> 侧载安装的“Play 保护机制扫描”提示由设备端触发，开发者无法关闭；
+> 侧载安装的"Play 保护机制扫描"提示由设备端触发，开发者无法关闭；
 > 本项目通过完整签名方案、零权限与可验证凭据把拦截概率降到最低。
 > 完整说明见 [安装稳定性保障](install-compatibility.md)。
 
@@ -110,6 +111,7 @@ adb install -r GNCal-v1.3.0-release.apk
 要求：JDK 17+（推荐 21）、Android SDK Platform 37 与 Build-Tools 37.0.0。
 签名信息放在根目录 `keystore.properties`（已 gitignore），缺省时回退调试签名。
 代码透明度密钥为 `transparency.jks`（已 gitignore，需 ≥3072 位）。
+字体由 `.toolchain/merge_font.py` 生成（需 Python + fontTools），产物在 `app/src/main/res/font/`。
 
 ## 技术栈
 
@@ -125,7 +127,7 @@ adb install -r GNCal-v1.3.0-release.apk
 
 ```
 app/src/main/java/com/gncal/app/
-├─ MainActivity.kt                入口（edge-to-edge、语言配置）
+├─ MainActivity.kt                入口（edge-to-edge、语言区域设置）
 ├─ model/
 │  ├─ FlashCalculator.kt          曝光计算核心（纯 Kotlin，可单测）
 │  └─ FlashProfile.kt             闪光灯档案数据模型
@@ -134,20 +136,24 @@ app/src/main/java/com/gncal/app/
    ├─ GnCalApp.kt                 顶部导航、路由、公式弹层、关于对话框
    ├─ theme/
    │  ├─ Theme.kt                 Material 3 主题、动态取色、语言与字阶
-   │  ├─ GlassEffects.kt          玻璃引擎：背景采样、模糊、高光、折射（v1.3.0）
+   │  ├─ Type.kt                  字族与字阶（IBM Plex Sans + 思源宋体，按标题分粗细）
    │  └─ ColorPresets.kt          配色预设
    ├─ calc/                       计算页（模式、参数、结果、对照表）
    └─ settings/                   设置页
+
+app/src/main/res/
+├─ font/gn_font_{light,regular,medium,bold}.ttf   中西文合并字体（每档约 214 KB）
+└─ values / values-en / values-zh-rTW             简中 / 英文 / 繁中
 ```
 
 ## 文档
 
-- [玻璃视觉设计：毛玻璃 vs 液态玻璃](glass-design.md)
 - [安装稳定性保障策略](install-compatibility.md)
 
 ## 变更记录
 
-- [v1.3.0](../CHANGELOG-v1.3.md)：真实背景模糊玻璃引擎、v3/v4 签名、code transparency、零权限
+- [v1.4.0](../CHANGELOG-v1.4.md)：移除玻璃风格、IBM Plex Sans + 思源宋体合并字体、新增繁体中文、零权限
+- [v1.3.0](../CHANGELOG-v1.3.md)：v3/v4 签名、code transparency（玻璃风格已于 v1.4.0 移除）
 - [v1.2.0](../CHANGELOG-v1.2.md)：自定义闪光灯档案
 - [v1.1.0](../CHANGELOG-v1.1.md)：底部导航、设置页、语言/字号/视觉风格/配色预设
 

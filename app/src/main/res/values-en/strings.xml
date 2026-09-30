@@ -16,7 +16,7 @@
     <string name="settings_language">Language</string>
     <string name="settings_font_size">Font Size</string>
     <string name="settings_theme">Theme</string>
-    <string name="settings_visual_style">Visual Style</string>
+
     <string name="settings_color_preset">Color Preset</string>
     <string name="settings_flash_profiles">Flash profiles</string>
     <string name="settings_flash_profiles_desc">Save custom flash names and GN values for quick selection on the home screen</string>
@@ -35,15 +35,12 @@
 
     <string name="language_system">System</string>
     <string name="language_chinese">简体中文</string>
+    <string name="language_traditional_chinese">繁體中文</string>
     <string name="language_english">English</string>
 
     <string name="font_size_system">System</string>
     <string name="font_size_compact">Compact</string>
     <string name="font_size_large">Large</string>
-
-    <string name="visual_standard">Standard</string>
-    <string name="visual_frosted">Frosted Glass</string>
-    <string name="visual_liquid">Liquid Glass</string>
 
     <string name="preset_amber">Amber</string>
     <string name="preset_ocean">Ocean</string>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GN 閃光曝光</string>
+    <string name="app_subtitle">閃光燈曝光計算器</string>
+
+    <string name="cd_app_icon">應用程式圖示</string>
+    <string name="action_info">公式說明</string>
+    <string name="action_more">更多選項</string>
+    <string name="action_theme">外觀設定</string>
+    <string name="action_about">關於</string>
+    <string name="action_close">關閉</string>
+    <string name="action_back">返回</string>
+    <string name="action_reset">重置參數</string>
+
+    <string name="settings_title">設定</string>
+    <string name="settings_language">語言</string>
+    <string name="settings_font_size">文字大小</string>
+    <string name="settings_theme">主題</string>
+    <string name="settings_color_preset">配色方案</string>
+    <string name="settings_flash_profiles">閃光燈清單</string>
+    <string name="settings_flash_profiles_desc">為常用閃光燈儲存自訂名稱與 GN 值，首頁可快速切換</string>
+    <string name="flash_profiles_empty">還沒有儲存的閃光燈</string>
+    <string name="action_add_flash">新增閃光燈</string>
+    <string name="action_edit_flash">編輯</string>
+    <string name="action_delete_flash">刪除</string>
+    <string name="action_save">儲存</string>
+    <string name="flash_profile_add_title">新增閃光燈</string>
+    <string name="flash_profile_edit_title">編輯閃光燈</string>
+    <string name="label_flash_name">閃光燈名稱</string>
+    <string name="label_flash_gn">GN 值（ISO 100）</string>
+    <string name="hint_flash_name">例如：我的機頂燈</string>
+    <string name="hint_flash_gn">例如：36</string>
+    <string name="msg_flash_profile_invalid">請輸入名稱和大於 0 的 GN 值</string>
+
+    <string name="language_system">跟隨系統</string>
+    <string name="language_chinese">簡體中文</string>
+    <string name="language_traditional_chinese">繁體中文</string>
+    <string name="language_english">English</string>
+
+    <string name="font_size_system">跟隨系統</string>
+    <string name="font_size_compact">緊湊</string>
+    <string name="font_size_large">大字</string>
+
+    <string name="preset_amber">琥珀橙</string>
+    <string name="preset_ocean">海洋藍</string>
+    <string name="preset_mint">薄荷綠</string>
+    <string name="preset_rose">玫瑰粉</string>
+
+    <string name="mode_aperture">求光圈</string>
+    <string name="mode_distance">求距離</string>
+    <string name="mode_gn">求 GN</string>
+    <string name="mode_iso">求 ISO</string>
+
+    <string name="label_gn">閃光燈 GN（ISO 100 基準）</string>
+    <string name="label_flash_profile">快速選擇閃光燈</string>
+    <string name="flash_profile_manual">自訂 GN（手動輸入）</string>
+    <string name="label_aperture">光圈</string>
+    <string name="label_distance">拍攝距離</string>
+    <string name="label_iso">ISO</string>
+    <string name="label_power">閃光輸出功率</string>
+    <string name="label_flash_comp">閃光曝光補償</string>
+    <string name="label_unit">距離單位</string>
+    <string name="label_solved">該項為待求結果</string>
+
+    <string name="unit_meter">公尺 (m)</string>
+    <string name="unit_feet">英尺 (ft)</string>
+    <string name="unit_m_short">m</string>
+    <string name="unit_ft_short">ft</string>
+
+    <string name="section_parameters">拍攝參數</string>
+    <string name="section_mode">計算目標</string>
+    <string name="section_advanced">進階設定</string>
+    <string name="section_result">計算結果</string>
+    <string name="section_reference">光圈 — 距離對照表</string>
+
+    <string name="result_aperture">所需光圈</string>
+    <string name="result_distance">拍攝距離</string>
+    <string name="result_required_gn">所需 GN</string>
+    <string name="result_iso">所需 ISO</string>
+    <string name="result_effective_gn">有效 GN（目前 ISO 與功率）</string>
+
+    <string name="formula_basic">GN = 光圈 × 距離（ISO 100）</string>
+    <string name="formula_iso_gn">GN(ISO) = GN₁₀₀ × √(ISO ÷ 100)</string>
+    <string name="formula_aperture">光圈 = 有效 GN ÷ 距離</string>
+    <string name="formula_distance">距離 = 有效 GN ÷ 光圈</string>
+    <string name="formula_iso">ISO = 100 × (光圈 × 距離 ÷ GN₁₀₀)²</string>
+
+    <string name="hint_gn">例如 36（常見機頂燈）</string>
+    <string name="hint_distance">主體到燈的距離</string>
+
+    <string name="msg_enter_valid">請輸入大於 0 的有效數值</string>
+    <string name="msg_waiting">填寫其餘參數後自動計算</string>
+    <string name="msg_nearest_aperture">推薦標準光圈 f/%1$s，與理論值相差 %2$s EV</string>
+    <string name="msg_gn_reference">需要 GN ≥ %1$s（ISO 100，%2$s）的閃光燈</string>
+    <string name="msg_power_effect">功率 %1$s 下，有效 GN 為 %2$s</string>
+    <string name="msg_sync_speed">提示：使用閃光燈時快門不要高於同步速度（多為 1/200s 或 1/250s）</string>
+
+    <string name="warn_distance_near">距離小於 %1$s %2$s：容易曝光不均或高光溢出，建議後退或降低輸出</string>
+    <string name="warn_distance_far">距離超過 %1$s %2$s：已接近該燈的有效範圍上限，建議提高 ISO 或放大光圈</string>
+    <string name="warn_aperture_limit">理論光圈超出常用範圍（f/1.0 – f/32），請調整距離、ISO 或功率</string>
+    <string name="warn_iso_high">ISO %1$d 偏高，注意噪點與動態範圍損失</string>
+    <string name="warn_iso_low">所需 ISO 低於 %1$d，相機原生感光度即可滿足</string>
+    <string name="warn_gn_large">所需 GN 超過 %1$d，普通機頂燈難以滿足，改用外拍燈或縮短距離</string>
+    <string name="warn_gn_small">所需 GN 低於 %1$d，注意距離過近可能過曝</string>
+
+    <string name="info_mode_aperture">已知閃光燈 GN、距離與 ISO，計算正確曝光所需的光圈值。</string>
+    <string name="info_mode_distance">已知閃光燈 GN、光圈與 ISO，計算閃光燈能夠覆蓋的拍攝距離。</string>
+    <string name="info_mode_gn">已知光圈、距離與 ISO，反推所需閃光燈的 GN 值（選購燈具時使用）。</string>
+    <string name="info_mode_iso">已知閃光燈 GN、光圈與距離，計算達到正確曝光所需的 ISO。</string>
+
+    <string name="pref_theme">主題</string>
+    <string name="pref_theme_system">跟隨系統</string>
+    <string name="pref_theme_light">淺色</string>
+    <string name="pref_theme_dark">深色</string>
+    <string name="pref_dynamic_color">動態取色 Material You</string>
+    <string name="pref_dynamic_color_desc">使用 Android 12+ 桌布配色，在 Android 16 上效果最佳</string>
+
+    <string name="about_title">關於</string>
+    <string name="about_body">GN 閃光曝光計算器 · 版本 %1$s\n\n依據 閃光燈曝光公式 GN = 光圈 × 距離（ISO 100 基準）實現光圈、距離、GN、ISO 四者互算，內建 1/3 檔標準光圈與感光度檔位、輸出功率與閃光補償修正。\n\n採用 Jetpack Compose + Material 3 建構，適配 Android 16（API 36）的沉浸式全螢幕、預測返回、動態取色與大螢幕自適應佈局。</string>
+
+    <string name="cd_decrease">減小</string>
+    <string name="cd_increase">增大</string>
+    <string name="table_header_aperture">光圈</string>
+    <string name="table_header_distance">距離</string>
+</resources>

@@ -18,11 +18,10 @@ import java.util.UUID
 
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
-enum class LanguageMode { SYSTEM, CHINESE, ENGLISH }
+/** 语言模式。枚举顺序即 DataStore 存储值，新增项只能追加，不可插入中间 */
+enum class LanguageMode { SYSTEM, CHINESE, ENGLISH, TRADITIONAL_CHINESE }
 
 enum class FontSizeMode { SYSTEM, COMPACT, LARGE }
-
-enum class VisualStyle { STANDARD, FROSTED, LIQUID }
 
 enum class ColorPreset { AMBER, OCEAN, MINT, ROSE }
 
@@ -38,7 +37,6 @@ class UserPreferencesRepository(private val context: Context) {
         val LAST_MODE = intPreferencesKey("last_mode")
         val LANGUAGE = intPreferencesKey("language")
         val FONT_SIZE = intPreferencesKey("font_size")
-        val VISUAL_STYLE = intPreferencesKey("visual_style")
         val COLOR_PRESET = intPreferencesKey("color_preset")
         val FLASH_PROFILES = stringPreferencesKey("flash_profiles")
     }
@@ -63,10 +61,6 @@ class UserPreferencesRepository(private val context: Context) {
 
     val fontSize: Flow<FontSizeMode> = context.dataStore.data.map { prefs ->
         FontSizeMode.entries.getOrElse(prefs[Keys.FONT_SIZE] ?: 0) { FontSizeMode.SYSTEM }
-    }
-
-    val visualStyle: Flow<VisualStyle> = context.dataStore.data.map { prefs ->
-        VisualStyle.entries.getOrElse(prefs[Keys.VISUAL_STYLE] ?: 0) { VisualStyle.STANDARD }
     }
 
     val colorPreset: Flow<ColorPreset> = context.dataStore.data.map { prefs ->
@@ -99,10 +93,6 @@ class UserPreferencesRepository(private val context: Context) {
 
     suspend fun setFontSize(fontSize: FontSizeMode) {
         context.dataStore.edit { it[Keys.FONT_SIZE] = fontSize.ordinal }
-    }
-
-    suspend fun setVisualStyle(style: VisualStyle) {
-        context.dataStore.edit { it[Keys.VISUAL_STYLE] = style.ordinal }
     }
 
     suspend fun setColorPreset(preset: ColorPreset) {

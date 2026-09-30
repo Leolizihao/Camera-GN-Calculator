@@ -16,7 +16,7 @@
     <string name="settings_language">语言</string>
     <string name="settings_font_size">文字大小</string>
     <string name="settings_theme">主题</string>
-    <string name="settings_visual_style">视觉效果</string>
+
     <string name="settings_color_preset">配色方案</string>
     <string name="settings_flash_profiles">闪光灯列表</string>
     <string name="settings_flash_profiles_desc">为常用闪光灯保存自定义名称与 GN 值，首页可快速切换</string>
@@ -35,15 +35,12 @@
 
     <string name="language_system">跟随系统</string>
     <string name="language_chinese">简体中文</string>
+    <string name="language_traditional_chinese">繁體中文</string>
     <string name="language_english">English</string>
 
     <string name="font_size_system">跟随系统</string>
     <string name="font_size_compact">紧凑</string>
     <string name="font_size_large">大字</string>
-
-    <string name="visual_standard">标准</string>
-    <string name="visual_frosted">毛玻璃</string>
-    <string name="visual_liquid">液态玻璃</string>
 
     <string name="preset_amber">琥珀橙</string>
     <string name="preset_ocean">海洋蓝</string>

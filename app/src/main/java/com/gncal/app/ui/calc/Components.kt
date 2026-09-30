@@ -32,9 +32,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.gncal.app.R
-import com.gncal.app.data.VisualStyle
-import com.gncal.app.ui.theme.GlassSurface
-import com.gncal.app.ui.theme.LocalVisualStyle
 
 /** 提示级别：决定提示卡片的配色 */
 enum class HintLevel { INFO, TIP, WARNING }
@@ -45,8 +42,18 @@ fun SectionCard(
     title: String? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val currentVisualStyle = LocalVisualStyle.current
-    val body: @Composable () -> Unit = {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        ),
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (title != null) {
                 Text(
@@ -56,32 +63,6 @@ fun SectionCard(
                 )
             }
             content()
-        }
-    }
-
-    if (currentVisualStyle == VisualStyle.STANDARD) {
-        Card(
-            modifier = modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.large,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-            ),
-            border = androidx.compose.foundation.BorderStroke(
-                1.dp,
-                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f)
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-        ) {
-            body()
-        }
-    } else {
-        // 玻璃风格：背景采样 + 模糊 + 折射描边
-        GlassSurface(
-            style = currentVisualStyle,
-            modifier = modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.large
-        ) {
-            body()
         }
     }
 }
@@ -190,7 +171,6 @@ fun SteppedSliderRow(
 
 @Composable
 fun HintCard(text: String, level: HintLevel, modifier: Modifier = Modifier) {
-    val visualStyle = LocalVisualStyle.current
     val (container, content, icon) = when (level) {
         HintLevel.INFO -> Triple(
             MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -209,7 +189,12 @@ fun HintCard(text: String, level: HintLevel, modifier: Modifier = Modifier) {
         )
     }
 
-    val body: @Composable () -> Unit = {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = container,
+        shape = MaterialTheme.shapes.medium,
+        tonalElevation = 0.dp
+    ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.Top
@@ -231,27 +216,6 @@ fun HintCard(text: String, level: HintLevel, modifier: Modifier = Modifier) {
                     .weight(1f),
                 textAlign = TextAlign.Start
             )
-        }
-    }
-
-    if (visualStyle == VisualStyle.STANDARD) {
-        Surface(
-            modifier = modifier.fillMaxWidth(),
-            color = container,
-            shape = MaterialTheme.shapes.medium,
-            tonalElevation = 0.dp
-        ) {
-            body()
-        }
-    } else {
-        // 玻璃风格：提示色作为玻璃染色，保留语义配色
-        GlassSurface(
-            style = visualStyle,
-            modifier = modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
-            tint = container
-        ) {
-            body()
         }
     }
 }

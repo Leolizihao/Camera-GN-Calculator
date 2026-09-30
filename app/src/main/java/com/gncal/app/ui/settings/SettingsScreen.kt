@@ -45,7 +45,6 @@ import com.gncal.app.data.ColorPreset
 import com.gncal.app.data.FontSizeMode
 import com.gncal.app.data.LanguageMode
 import com.gncal.app.data.ThemeMode
-import com.gncal.app.data.VisualStyle
 import com.gncal.app.model.FlashCalculator
 import com.gncal.app.model.FlashProfile
 import com.gncal.app.ui.calc.SectionCard
@@ -57,14 +56,12 @@ fun SettingsScreen(
     dynamicColor: Boolean,
     language: LanguageMode,
     fontSize: FontSizeMode,
-    visualStyle: VisualStyle,
     colorPreset: ColorPreset,
     flashProfiles: List<FlashProfile>,
     onThemeModeChange: (ThemeMode) -> Unit,
     onDynamicColorChange: (Boolean) -> Unit,
     onLanguageChange: (LanguageMode) -> Unit,
     onFontSizeChange: (FontSizeMode) -> Unit,
-    onVisualStyleChange: (VisualStyle) -> Unit,
     onColorPresetChange: (ColorPreset) -> Unit,
     onAddFlashProfile: (String, Double) -> Unit,
     onUpdateFlashProfile: (FlashProfile) -> Unit,
@@ -109,6 +106,7 @@ fun SettingsScreen(
                         label = when (mode) {
                             LanguageMode.SYSTEM -> stringResource(R.string.language_system)
                             LanguageMode.CHINESE -> stringResource(R.string.language_chinese)
+                            LanguageMode.TRADITIONAL_CHINESE -> stringResource(R.string.language_traditional_chinese)
                             LanguageMode.ENGLISH -> stringResource(R.string.language_english)
                         },
                         selected = language == mode,
@@ -167,21 +165,6 @@ fun SettingsScreen(
                         )
                     }
                     Switch(checked = dynamicColor, onCheckedChange = onDynamicColorChange)
-                }
-            }
-
-            // Visual Style
-            SectionCard(title = stringResource(R.string.settings_visual_style)) {
-                VisualStyle.entries.forEach { style ->
-                    SettingRow(
-                        label = when (style) {
-                            VisualStyle.STANDARD -> stringResource(R.string.visual_standard)
-                            VisualStyle.FROSTED -> stringResource(R.string.visual_frosted)
-                            VisualStyle.LIQUID -> stringResource(R.string.visual_liquid)
-                        },
-                        selected = visualStyle == style,
-                        onClick = { onVisualStyleChange(style) }
-                    )
                 }
             }
 

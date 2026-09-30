@@ -22,9 +22,6 @@ import com.gncal.app.data.ColorPreset
 import com.gncal.app.data.FontSizeMode
 import com.gncal.app.data.LanguageMode
 import com.gncal.app.data.ThemeMode
-import com.gncal.app.data.VisualStyle
-
-val LocalVisualStyle = staticCompositionLocalOf { VisualStyle.STANDARD }
 
 @Composable
 fun GnCalTheme(
@@ -32,7 +29,6 @@ fun GnCalTheme(
     dynamicColor: Boolean = true,
     colorPreset: ColorPreset = ColorPreset.AMBER,
     fontSize: FontSizeMode = FontSizeMode.SYSTEM,
-    visualStyle: VisualStyle = VisualStyle.STANDARD,
     language: LanguageMode = LanguageMode.SYSTEM,
     content: @Composable () -> Unit
 ) {
@@ -76,6 +72,7 @@ fun GnCalTheme(
         val locale = when (language) {
             LanguageMode.SYSTEM -> null
             LanguageMode.CHINESE -> java.util.Locale.SIMPLIFIED_CHINESE
+            LanguageMode.TRADITIONAL_CHINESE -> java.util.Locale.TRADITIONAL_CHINESE
             LanguageMode.ENGLISH -> java.util.Locale.ENGLISH
         }
         if (locale == null) {
@@ -89,9 +86,6 @@ fun GnCalTheme(
     }
 
     CompositionLocalProvider(
-        LocalVisualStyle provides visualStyle,
-        // 背景采样器：玻璃面板内部用它重绘一份屏幕背景做真实背景模糊
-        LocalGlassBackdrop provides { backdropModifier -> AppGlassBackdrop(backdropModifier) },
         androidx.compose.ui.platform.LocalContext provides localizedContext,
         LocalConfiguration provides localizedContext.resources.configuration
     ) {

@@ -14,7 +14,6 @@ import com.gncal.app.data.FontSizeMode
 import com.gncal.app.data.LanguageMode
 import com.gncal.app.data.ThemeMode
 import com.gncal.app.data.UserPreferencesRepository
-import com.gncal.app.data.VisualStyle
 import com.gncal.app.ui.GnCalApp
 import com.gncal.app.ui.theme.GnCalTheme
 import kotlinx.coroutines.flow.first
@@ -36,7 +35,6 @@ class MainActivity : ComponentActivity() {
             val dynamicColor by preferences.dynamicColor.collectAsStateWithLifecycle(true)
             val colorPreset by preferences.colorPreset.collectAsStateWithLifecycle(ColorPreset.AMBER)
             val fontSize by preferences.fontSize.collectAsStateWithLifecycle(FontSizeMode.SYSTEM)
-            val visualStyle by preferences.visualStyle.collectAsStateWithLifecycle(VisualStyle.STANDARD)
             val language by preferences.language.collectAsStateWithLifecycle(LanguageMode.SYSTEM)
 
             GnCalTheme(
@@ -44,7 +42,6 @@ class MainActivity : ComponentActivity() {
                 dynamicColor = dynamicColor,
                 colorPreset = colorPreset,
                 fontSize = fontSize,
-                visualStyle = visualStyle,
                 language = language
             ) {
                 GnCalApp(preferences = preferences)
@@ -57,7 +54,8 @@ class MainActivity : ComponentActivity() {
         val language = runBlocking { prefs.language.first() }
         val locale = when (language) {
             LanguageMode.SYSTEM -> Locale.getDefault()
-            LanguageMode.CHINESE -> Locale.CHINESE
+            LanguageMode.CHINESE -> Locale.SIMPLIFIED_CHINESE
+            LanguageMode.TRADITIONAL_CHINESE -> Locale.TRADITIONAL_CHINESE
             LanguageMode.ENGLISH -> Locale.ENGLISH
         }
         

@@ -49,7 +49,7 @@ import com.gncal.app.model.FlashProfile
 import com.gncal.app.model.PhotoScales
 import com.gncal.app.model.ReferenceRow
 import com.gncal.app.model.SolveMode
-import com.gncal.app.ui.theme.GlassSurface
+
 import java.util.Locale
 
 private val CalculatorStateSaver = mapSaver(
@@ -473,7 +473,6 @@ private fun ResultsPane(
 
 @Composable
 private fun ResultCard(result: CalcResult, modifier: Modifier = Modifier) {
-    val visualStyle = com.gncal.app.ui.theme.LocalVisualStyle.current
     val containerColor = if (result.isValid) {
         MaterialTheme.colorScheme.primaryContainer
     } else {
@@ -524,25 +523,13 @@ private fun ResultCard(result: CalcResult, modifier: Modifier = Modifier) {
         }
     }
 
-    if (visualStyle == com.gncal.app.data.VisualStyle.STANDARD) {
-        Surface(
-            modifier = modifier.fillMaxWidth(),
-            color = containerColor,
-            shape = MaterialTheme.shapes.extraLarge,
-            tonalElevation = 2.dp
-        ) {
-            body()
-        }
-    } else {
-        // 玻璃风格：真实背景采样 + 模糊，底色用结果色做染色
-        GlassSurface(
-            style = visualStyle,
-            modifier = modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLarge,
-            tint = containerColor
-        ) {
-            body()
-        }
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = containerColor,
+        shape = MaterialTheme.shapes.extraLarge,
+        tonalElevation = 2.dp
+    ) {
+        body()
     }
 }
 
