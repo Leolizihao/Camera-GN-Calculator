@@ -33,8 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.gncal.app.R
 import com.gncal.app.data.VisualStyle
+import com.gncal.app.ui.theme.GlassSurface
 import com.gncal.app.ui.theme.LocalVisualStyle
-import com.gncal.app.ui.theme.visualStyle
 
 /** 提示级别：决定提示卡片的配色 */
 enum class HintLevel { INFO, TIP, WARNING }
@@ -46,33 +46,7 @@ fun SectionCard(
     content: @Composable ColumnScope.() -> Unit
 ) {
     val currentVisualStyle = LocalVisualStyle.current
-    
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .then(
-                if (currentVisualStyle != VisualStyle.STANDARD) {
-                    Modifier.visualStyle(currentVisualStyle, MaterialTheme.shapes.large, isCard = true)
-                } else {
-                    Modifier
-                }
-            ),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = if (currentVisualStyle == VisualStyle.STANDARD) {
-                MaterialTheme.colorScheme.surfaceContainerLow
-            } else {
-                Color.Transparent
-            }
-        ),
-        border = if (currentVisualStyle == VisualStyle.STANDARD) {
-            androidx.compose.foundation.BorderStroke(
-                1.dp,
-                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f)
-            )
-        } else null,
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
+    val body: @Composable () -> Unit = {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (title != null) {
                 Text(
@@ -82,6 +56,32 @@ fun SectionCard(
                 )
             }
             content()
+        }
+    }
+
+    if (currentVisualStyle == VisualStyle.STANDARD) {
+        Card(
+            modifier = modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            ),
+            border = androidx.compose.foundation.BorderStroke(
+                1.dp,
+                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f)
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        ) {
+            body()
+        }
+    } else {
+        // 玻璃风格：背景采样 + 模糊 + 折射描边
+        GlassSurface(
+            style = currentVisualStyle,
+            modifier = modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large
+        ) {
+            body()
         }
     }
 }
@@ -209,21 +209,7 @@ fun HintCard(text: String, level: HintLevel, modifier: Modifier = Modifier) {
         )
     }
 
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .then(
-                if (visualStyle == VisualStyle.STANDARD) Modifier
-                else Modifier.visualStyle(visualStyle, MaterialTheme.shapes.medium, isCard = true)
-            ),
-        color = if (visualStyle == VisualStyle.STANDARD) {
-            container
-        } else {
-            container.copy(alpha = 0.68f)
-        },
-        shape = MaterialTheme.shapes.medium,
-        tonalElevation = 0.dp
-    ) {
+    val body: @Composable () -> Unit = {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.Top
@@ -245,6 +231,27 @@ fun HintCard(text: String, level: HintLevel, modifier: Modifier = Modifier) {
                     .weight(1f),
                 textAlign = TextAlign.Start
             )
+        }
+    }
+
+    if (visualStyle == VisualStyle.STANDARD) {
+        Surface(
+            modifier = modifier.fillMaxWidth(),
+            color = container,
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = 0.dp
+        ) {
+            body()
+        }
+    } else {
+        // 玻璃风格：提示色作为玻璃染色，保留语义配色
+        GlassSurface(
+            style = visualStyle,
+            modifier = modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium,
+            tint = container
+        ) {
+            body()
         }
     }
 }

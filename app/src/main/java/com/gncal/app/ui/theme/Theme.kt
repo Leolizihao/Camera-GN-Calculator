@@ -90,6 +90,8 @@ fun GnCalTheme(
 
     CompositionLocalProvider(
         LocalVisualStyle provides visualStyle,
+        // 背景采样器：玻璃面板内部用它重绘一份屏幕背景做真实背景模糊
+        LocalGlassBackdrop provides { backdropModifier -> AppGlassBackdrop(backdropModifier) },
         androidx.compose.ui.platform.LocalContext provides localizedContext,
         LocalConfiguration provides localizedContext.resources.configuration
     ) {

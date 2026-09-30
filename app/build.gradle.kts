@@ -17,8 +17,8 @@ android {
         minSdk = 26
         // Android 16（API 36）为目标平台，启用 edge-to-edge、预测返回等新特性
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.2.0"
+        versionCode = 4
+        versionName = "1.3.0"
     }
 
     // 签名配置：读取根目录 keystore.properties；若文件不存在则回退到调试签名，
@@ -39,6 +39,13 @@ android {
                 storePassword = props.getProperty("storePassword")
                 keyAlias = props.getProperty("keyAlias")
                 keyPassword = props.getProperty("keyPassword")
+                // 全量签名方案：v1 兼容 Android 7 以下，v2 为 Android 7+ 必需，
+                // v3/v3.1 让 Android 9+/13+ 走更强的校验并支持密钥轮换，
+                // v4 供 adb 增量安装（adb install --incremental）使用。
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
+                enableV4Signing = true
             }
         }
     }

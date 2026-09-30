@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -43,6 +44,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -61,7 +63,8 @@ import com.gncal.app.model.SolveMode
 import com.gncal.app.ui.calc.CalculatorScreen
 import com.gncal.app.ui.calc.rememberCalculatorState
 import com.gncal.app.ui.settings.SettingsScreen
-import com.gncal.app.ui.theme.visualStyle
+import com.gncal.app.ui.theme.GlassSurface
+import com.gncal.app.ui.theme.glassBackdrop
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 
@@ -96,8 +99,17 @@ fun GnCalApp(preferences: UserPreferencesRepository, modifier: Modifier = Modifi
     }
 
     Scaffold(
-        modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.background,
+        modifier = modifier
+            .fillMaxSize()
+            // 玻璃风格下由 Scaffold 自己绘制装饰背景，容器色透明以便透出背景
+            .then(
+                if (visualStyle == VisualStyle.STANDARD) Modifier else Modifier.glassBackdrop()
+            ),
+        containerColor = if (visualStyle == VisualStyle.STANDARD) {
+            MaterialTheme.colorScheme.background
+        } else {
+            Color.Transparent
+        },
         topBar = {
             if (destination == Destination.CALCULATOR) {
                 Column {
@@ -149,8 +161,16 @@ fun GnCalApp(preferences: UserPreferencesRepository, modifier: Modifier = Modifi
                             }
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer
+                            containerColor = if (visualStyle == VisualStyle.STANDARD) {
+                                MaterialTheme.colorScheme.surface
+                            } else {
+                                Color.Transparent
+                            },
+                            scrolledContainerColor = if (visualStyle == VisualStyle.STANDARD) {
+                                MaterialTheme.colorScheme.surfaceContainer
+                            } else {
+                                Color.Transparent
+                            }
                         )
                     )
                     ModeNavigation(
@@ -287,25 +307,29 @@ private fun FormulaSheet(onDismiss: () -> Unit, modifier: Modifier = Modifier) {
 @Composable
 private fun FormulaLine(text: String, modifier: Modifier = Modifier) {
     val visualStyle = com.gncal.app.ui.theme.LocalVisualStyle.current
-    androidx.compose.material3.Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .then(
-                if (visualStyle == VisualStyle.STANDARD) Modifier
-                else Modifier.visualStyle(visualStyle, MaterialTheme.shapes.medium, isCard = true)
-            ),
-        color = if (visualStyle == VisualStyle.STANDARD) {
-            MaterialTheme.colorScheme.surfaceContainerHigh
-        } else {
-            MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
-        },
-        shape = MaterialTheme.shapes.medium
-    ) {
+    val body: @Composable () -> Unit = {
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
         )
+    }
+    if (visualStyle == VisualStyle.STANDARD) {
+        androidx.compose.material3.Surface(
+            modifier = modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            shape = MaterialTheme.shapes.medium
+        ) {
+            body()
+        }
+    } else {
+        GlassSurface(
+            style = visualStyle,
+            modifier = modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium
+        ) {
+            body()
+        }
     }
 }
 

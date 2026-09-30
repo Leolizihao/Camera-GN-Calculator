@@ -49,7 +49,7 @@ import com.gncal.app.model.FlashProfile
 import com.gncal.app.model.PhotoScales
 import com.gncal.app.model.ReferenceRow
 import com.gncal.app.model.SolveMode
-import com.gncal.app.ui.theme.visualStyle
+import com.gncal.app.ui.theme.GlassSurface
 import java.util.Locale
 
 private val CalculatorStateSaver = mapSaver(
@@ -474,51 +474,42 @@ private fun ResultsPane(
 @Composable
 private fun ResultCard(result: CalcResult, modifier: Modifier = Modifier) {
     val visualStyle = com.gncal.app.ui.theme.LocalVisualStyle.current
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .then(
-                if (visualStyle == com.gncal.app.data.VisualStyle.STANDARD) Modifier
-                else Modifier.visualStyle(visualStyle, MaterialTheme.shapes.extraLarge, isCard = true)
-            ),
-        color = if (visualStyle == com.gncal.app.data.VisualStyle.STANDARD && result.isValid) {
-            MaterialTheme.colorScheme.primaryContainer
-        } else if (visualStyle == com.gncal.app.data.VisualStyle.STANDARD) {
-            MaterialTheme.colorScheme.errorContainer
-        } else if (result.isValid) {
-            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
-        } else {
-            MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.7f)
-        },
-        shape = MaterialTheme.shapes.extraLarge,
-        tonalElevation = 2.dp
-    ) {
+    val containerColor = if (result.isValid) {
+        MaterialTheme.colorScheme.primaryContainer
+    } else {
+        MaterialTheme.colorScheme.errorContainer
+    }
+    val onContainerColor = if (result.isValid) {
+        MaterialTheme.colorScheme.onPrimaryContainer
+    } else {
+        MaterialTheme.colorScheme.onErrorContainer
+    }
+    val body: @Composable () -> Unit = {
         Column(
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = stringResource(resultLabelRes(result.mode)),
                 style = MaterialTheme.typography.titleMedium,
-                color = if (result.isValid) MaterialTheme.colorScheme.onPrimaryContainer
-                else MaterialTheme.colorScheme.onErrorContainer
+                color = onContainerColor
             )
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
-                text = result.primary,
+                    text = result.primary,
                     style = MaterialTheme.typography.displayMedium.copy(
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
                     ),
-                    color = if (result.isValid) MaterialTheme.colorScheme.onPrimaryContainer
-                    else MaterialTheme.colorScheme.onErrorContainer
+                    color = onContainerColor
                 )
                 if (result.unitSuffix.isNotEmpty()) {
                     Text(
                         text = " ${result.unitSuffix}",
                         style = MaterialTheme.typography.titleLarge,
-                        color = if (result.isValid) MaterialTheme.colorScheme.onPrimaryContainer
-                        else MaterialTheme.colorScheme.onErrorContainer
+                        color = onContainerColor
                     )
                 }
             }
@@ -530,6 +521,27 @@ private fun ResultCard(result: CalcResult, modifier: Modifier = Modifier) {
                     textAlign = TextAlign.Center
                 )
             }
+        }
+    }
+
+    if (visualStyle == com.gncal.app.data.VisualStyle.STANDARD) {
+        Surface(
+            modifier = modifier.fillMaxWidth(),
+            color = containerColor,
+            shape = MaterialTheme.shapes.extraLarge,
+            tonalElevation = 2.dp
+        ) {
+            body()
+        }
+    } else {
+        // 玻璃风格：真实背景采样 + 模糊，底色用结果色做染色
+        GlassSurface(
+            style = visualStyle,
+            modifier = modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.extraLarge,
+            tint = containerColor
+        ) {
+            body()
         }
     }
 }

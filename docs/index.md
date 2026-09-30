@@ -1,6 +1,6 @@
 # GN 闪光曝光计算器
 
-![Version](https://img.shields.io/badge/Version-1.2.0-blue)
+![Version](https://img.shields.io/badge/Version-1.3.0-blue)
 ![Platform](https://img.shields.io/badge/Platform-Android%2016%20(API%2036)-3DDC84?logo=android)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.4.20-7F52FF?logo=kotlin)
 ![Compose](https://img.shields.io/badge/UI-Jetpack%20Compose%20%2B%20Material%203-4285F4?logo=jetpackcompose)
@@ -31,6 +31,14 @@
 - 光圈 — 距离对照表
 - 米 / 英尺一键切换（GN 与距离同步换算）
 
+### 玻璃视觉风格（v1.3.0）
+
+- **毛玻璃 Frosted**：真实背景采样 + 22dp 模糊 + 磨砂渐变底色，边界极淡，可读性优先
+- **液态玻璃 Liquid**：30dp 模糊 + 饱和度提升 + 镜面高光 + 折射描边 + 内阴影 + 3dp 投影
+- 两者均为**真实 backdrop blur**（`RenderEffect`），非"半透明渐变"伪装
+- API 31 以下自动降级为半透明玻璃，不崩溃、不空白
+- 详见 [玻璃视觉设计文档](glass-design.md)
+
 ### 闪光灯档案（v1.2.0）
 
 - 可自定义名称与 GN 值的闪光灯档案列表
@@ -43,7 +51,7 @@
 - 底部导航栏：四个计算目标一键切换
 - 语言：跟随系统 / 简体中文 / English（无需重启）
 - 字号：跟随系统 / 紧凑 90% / 大号 115%
-- 视觉风格：标准 Material 3 / 磨砂玻璃 / 液态玻璃（GPU 友好，非实时模糊）
+- 视觉风格：标准 Material 3 / 毛玻璃 / 液态玻璃
 - 配色预设（关闭动态取色时）：Amber / Ocean / Mint / Rose，均支持明暗模式
 - 主题：浅色 / 深色 / 跟随系统，动态取色 Material You
 
@@ -61,14 +69,20 @@
 
 ## 下载安装
 
-从仓库的 **Releases** 页面下载最新版本 **v1.2.0**（`GNCal-v1.2.0-release.apk`，7.36 MB，V2 签名）：
+从仓库的 **Releases** 页面下载最新版本 **v1.3.0**：
+
+| 文件 | 大小 | 说明 |
+| --- | --- | --- |
+| `GNCal-v1.3.0-release.apk` | 7.38 MB | 侧载安装用，V2 + V3 签名（含 v4 `.idsig`） |
+| `GNCal-v1.3.0-release.aab` | 约 19 MB | 含 code transparency 的 App Bundle |
+| `transparency.cert` | < 1 KB | 代码透明度公钥证书，供独立校验 |
 
 ```
-SHA-256: 45E638C7CB267A9E515FE8B020E4D623423552AF33C85A3A1BBAD74C11A7D724
+APK SHA-256: 06A2FCAEE3F2B7ED29FC7F030B6A49C74EA7EC930F1C6E1676260C3CB09C08AA
 ```
 
 ```powershell
-adb install -r GNCal-v1.2.0-release.apk
+adb install -r GNCal-v1.3.0-release.apk
 ```
 
 | 项目 | 值 |
@@ -76,18 +90,26 @@ adb install -r GNCal-v1.2.0-release.apk
 | 包名 | `com.gncal.app` |
 | minSdkVersion | 26（Android 8.0+） |
 | targetSdkVersion | **36（Android 16）** |
-| 历史版本 | v1.0.0（7.33 MB）、v1.1.0（7.36 MB） |
+| 权限 | **无（零权限）** |
+| 签名证书 SHA-256 | `9493CBED…40EB458DB`（RSA 2048，永久固定） |
+| 历史版本 | v1.0.0（7.33 MB）、v1.1.0（7.36 MB）、v1.2.0（7.36 MB） |
+
+> 侧载安装的“Play 保护机制扫描”提示由设备端触发，开发者无法关闭；
+> 本项目通过完整签名方案、零权限与可验证凭据把拦截概率降到最低。
+> 完整说明见 [安装稳定性保障](install-compatibility.md)。
 
 ## 自行构建
 
 ```bash
 ./gradlew :app:assembleDebug        # 调试包
-./gradlew :app:assembleRelease      # 已签名发布包
+./gradlew :app:assembleRelease      # 已签名发布包（v1/v2/v3/v4）
+./gradlew :app:bundleRelease        # App Bundle
 ./gradlew :app:testDebugUnitTest    # 单元测试（8 项）
 ```
 
 要求：JDK 17+（推荐 21）、Android SDK Platform 37 与 Build-Tools 37.0.0。
 签名信息放在根目录 `keystore.properties`（已 gitignore），缺省时回退调试签名。
+代码透明度密钥为 `transparency.jks`（已 gitignore，需 ≥3072 位）。
 
 ## 技术栈
 
@@ -109,14 +131,23 @@ app/src/main/java/com/gncal/app/
 │  └─ FlashProfile.kt             闪光灯档案数据模型
 ├─ data/UserPreferences.kt        DataStore 偏好（单位/主题/语言/字号/配色/档案）
 └─ ui/
-   ├─ GnCalApp.kt                 底部导航、路由、公式弹层、关于对话框
-   ├─ theme/                      主题、配色预设、视觉特效、字阶缩放
+   ├─ GnCalApp.kt                 顶部导航、路由、公式弹层、关于对话框
+   ├─ theme/
+   │  ├─ Theme.kt                 Material 3 主题、动态取色、语言与字阶
+   │  ├─ GlassEffects.kt          玻璃引擎：背景采样、模糊、高光、折射（v1.3.0）
+   │  └─ ColorPresets.kt          配色预设
    ├─ calc/                       计算页（模式、参数、结果、对照表）
    └─ settings/                   设置页
 ```
 
+## 文档
+
+- [玻璃视觉设计：毛玻璃 vs 液态玻璃](glass-design.md)
+- [安装稳定性保障策略](install-compatibility.md)
+
 ## 变更记录
 
+- [v1.3.0](../CHANGELOG-v1.3.md)：真实背景模糊玻璃引擎、v3/v4 签名、code transparency、零权限
 - [v1.2.0](../CHANGELOG-v1.2.md)：自定义闪光灯档案
 - [v1.1.0](../CHANGELOG-v1.1.md)：底部导航、设置页、语言/字号/视觉风格/配色预设
 
