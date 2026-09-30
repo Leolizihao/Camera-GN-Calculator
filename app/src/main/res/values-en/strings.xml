@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GN Flash Calc</string>
+    <string name="app_subtitle">Flash exposure calculator</string>
+
+    <string name="cd_app_icon">App icon</string>
+    <string name="action_info">Formulas</string>
+    <string name="action_more">More options</string>
+    <string name="action_theme">Appearance</string>
+    <string name="action_about">About</string>
+    <string name="action_close">Close</string>
+    <string name="action_back">Back</string>
+    <string name="action_reset">Reset</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_font_size">Font Size</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_visual_style">Visual Style</string>
+    <string name="settings_color_preset">Color Preset</string>
+    <string name="settings_flash_profiles">Flash profiles</string>
+    <string name="settings_flash_profiles_desc">Save custom flash names and GN values for quick selection on the home screen</string>
+    <string name="flash_profiles_empty">No saved flash profiles</string>
+    <string name="action_add_flash">Add flash</string>
+    <string name="action_edit_flash">Edit</string>
+    <string name="action_delete_flash">Delete</string>
+    <string name="action_save">Save</string>
+    <string name="flash_profile_add_title">Add flash</string>
+    <string name="flash_profile_edit_title">Edit flash</string>
+    <string name="label_flash_name">Flash name</string>
+    <string name="label_flash_gn">GN value (ISO 100)</string>
+    <string name="hint_flash_name">e.g. My speedlight</string>
+    <string name="hint_flash_gn">e.g. 36</string>
+    <string name="msg_flash_profile_invalid">Enter a name and a GN value greater than 0</string>
+
+    <string name="language_system">System</string>
+    <string name="language_chinese">简体中文</string>
+    <string name="language_english">English</string>
+
+    <string name="font_size_system">System</string>
+    <string name="font_size_compact">Compact</string>
+    <string name="font_size_large">Large</string>
+
+    <string name="visual_standard">Standard</string>
+    <string name="visual_frosted">Frosted Glass</string>
+    <string name="visual_liquid">Liquid Glass</string>
+
+    <string name="preset_amber">Amber</string>
+    <string name="preset_ocean">Ocean</string>
+    <string name="preset_mint">Mint</string>
+    <string name="preset_rose">Rose</string>
+
+    <string name="mode_aperture">Aperture</string>
+    <string name="mode_distance">Distance</string>
+    <string name="mode_gn">GN</string>
+    <string name="mode_iso">ISO</string>
+
+    <string name="label_gn">Guide number (ISO 100)</string>
+    <string name="label_flash_profile">Quick flash selection</string>
+    <string name="flash_profile_manual">Custom GN (manual)</string>
+    <string name="label_aperture">Aperture</string>
+    <string name="label_distance">Distance</string>
+    <string name="label_iso">ISO</string>
+    <string name="label_power">Flash power</string>
+    <string name="label_flash_comp">Flash compensation</string>
+    <string name="label_unit">Distance unit</string>
+    <string name="label_solved">This value is solved</string>
+
+    <string name="unit_meter">Meters (m)</string>
+    <string name="unit_feet">Feet (ft)</string>
+    <string name="unit_m_short">m</string>
+    <string name="unit_ft_short">ft</string>
+
+    <string name="section_parameters">Parameters</string>
+    <string name="section_mode">Calculate</string>
+    <string name="section_advanced">Advanced</string>
+    <string name="section_result">Result</string>
+    <string name="section_reference">Aperture — distance chart</string>
+
+    <string name="result_aperture">Required aperture</string>
+    <string name="result_distance">Distance</string>
+    <string name="result_required_gn">Required GN</string>
+    <string name="result_iso">Required ISO</string>
+    <string name="result_effective_gn">Effective GN (current ISO and power)</string>
+
+    <string name="formula_basic">GN = aperture × distance (ISO 100)</string>
+    <string name="formula_iso_gn">GN(ISO) = GN₁₀₀ × √(ISO ÷ 100)</string>
+    <string name="formula_aperture">Aperture = effective GN ÷ distance</string>
+    <string name="formula_distance">Distance = effective GN ÷ aperture</string>
+    <string name="formula_iso">ISO = 100 × (aperture × distance ÷ GN₁₀₀)²</string>
+
+    <string name="hint_gn">e.g. 36 for a typical speedlight</string>
+    <string name="hint_distance">Subject-to-flash distance</string>
+
+    <string name="msg_enter_valid">Enter a value greater than 0</string>
+    <string name="msg_waiting">Fill in the remaining values to calculate</string>
+    <string name="msg_nearest_aperture">Use standard aperture f/%1$s, off by %2$s EV</string>
+    <string name="msg_gn_reference">You need a flash with GN ≥ %1$s (ISO 100, %2$s)</string>
+    <string name="msg_power_effect">At %1$s power the effective GN is %2$s</string>
+    <string name="msg_sync_speed">Tip: keep the shutter at or below the sync speed (usually 1/200s or 1/250s)</string>
+
+    <string name="warn_distance_near">Closer than %1$s %2$s: uneven light or blown highlights, step back or lower power</string>
+    <string name="warn_distance_far">Beyond %1$s %2$s: near the limit of this flash, raise ISO or open the aperture</string>
+    <string name="warn_aperture_limit">Aperture outside the usual range (f/1.0 – f/32); adjust distance, ISO or power</string>
+    <string name="warn_iso_high">ISO %1$d is high; watch for noise and lost dynamic range</string>
+    <string name="warn_iso_low">Required ISO is below %1$d; the camera native range is enough</string>
+    <string name="warn_gn_large">Required GN above %1$d exceeds most speedlights; use a strobe or move closer</string>
+    <string name="warn_gn_small">Required GN is below %1$d; beware of overexposure when the flash is very close</string>
+
+    <string name="info_mode_aperture">Given GN, distance and ISO, find the aperture for correct exposure.</string>
+    <string name="info_mode_distance">Given GN, aperture and ISO, find the distance the flash can cover.</string>
+    <string name="info_mode_gn">Given aperture, distance and ISO, find the guide number you need.</string>
+    <string name="info_mode_iso">Given GN, aperture and distance, find the ISO for correct exposure.</string>
+
+    <string name="pref_theme">Theme</string>
+    <string name="pref_theme_system">System</string>
+    <string name="pref_theme_light">Light</string>
+    <string name="pref_theme_dark">Dark</string>
+    <string name="pref_dynamic_color">Dynamic color (Material You)</string>
+    <string name="pref_dynamic_color_desc">Use Android 12+ wallpaper colors, best on Android 16</string>
+
+    <string name="about_title">About</string>
+    <string name="about_body">GN Flash Calculator · version %1$s\n\nImplements GN = aperture × distance (ISO 100) with full conversion between aperture, distance, GN and ISO, including 1/3 stop scales, flash power and flash compensation.\n\nBuilt with Jetpack Compose and Material 3, optimized for Android 16 (API 36): edge-to-edge, predictive back, dynamic color and adaptive layouts.</string>
+
+    <string name="cd_decrease">Decrease</string>
+    <string name="cd_increase">Increase</string>
+    <string name="table_header_aperture">Aperture</string>
+    <string name="table_header_distance">Distance</string>
+</resources>

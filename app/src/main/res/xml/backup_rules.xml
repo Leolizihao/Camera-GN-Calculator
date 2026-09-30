@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- 仅备份应用设置（DataStore 中的用户偏好） -->
+    <include
+        domain="sharedpref"
+        path="." />
+    <include
+        domain="database"
+        path="gncal_settings.preferences_pb" />
+</full-backup-content>
