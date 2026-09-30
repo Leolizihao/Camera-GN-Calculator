@@ -46,6 +46,10 @@
     <string name="preset_ocean">海洋蓝</string>
     <string name="preset_mint">薄荷绿</string>
     <string name="preset_rose">玫瑰粉</string>
+    <string name="preset_forest">松林绿</string>
+    <string name="preset_violet">紫罗兰</string>
+    <string name="preset_coral">珊瑚橙</string>
+    <string name="preset_slate">石墨灰</string>
 
     <string name="mode_aperture">求光圈</string>
     <string name="mode_distance">求距离</string>

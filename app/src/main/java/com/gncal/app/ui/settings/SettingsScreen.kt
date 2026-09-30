@@ -178,6 +178,10 @@ fun SettingsScreen(
                                 ColorPreset.OCEAN -> stringResource(R.string.preset_ocean)
                                 ColorPreset.MINT -> stringResource(R.string.preset_mint)
                                 ColorPreset.ROSE -> stringResource(R.string.preset_rose)
+                                ColorPreset.FOREST -> stringResource(R.string.preset_forest)
+                                ColorPreset.VIOLET -> stringResource(R.string.preset_violet)
+                                ColorPreset.CORAL -> stringResource(R.string.preset_coral)
+                                ColorPreset.SLATE -> stringResource(R.string.preset_slate)
                             },
                             selected = colorPreset == preset,
                             onClick = { onColorPresetChange(preset) }

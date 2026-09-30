@@ -176,9 +176,185 @@ private val RoseDark = darkColorScheme(
     outline = Color(0xFF9E8C90)
 )
 
+// Forest preset - deep pine green tones
+private val ForestLight = lightColorScheme(
+    primary = Color(0xFF1E6B4C),
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = Color(0xFFA5F0C7),
+    onPrimaryContainer = Color(0xFF002114),
+    secondary = Color(0xFF4E6355),
+    onSecondary = Color(0xFFFFFFFF),
+    secondaryContainer = Color(0xFFD1E7D8),
+    onSecondaryContainer = Color(0xFF0C2015),
+    tertiary = Color(0xFF3B6173),
+    onTertiary = Color(0xFFFFFFFF),
+    tertiaryContainer = Color(0xFFBFE7F9),
+    onTertiaryContainer = Color(0xFF001E29),
+    background = Color(0xFFF4FBF7),
+    surface = Color(0xFFF4FBF7),
+    surfaceVariant = Color(0xFFDBE5DE),
+    onSurface = Color(0xFF181D1B),
+    onSurfaceVariant = Color(0xFF414941),
+    outline = Color(0xFF707972)
+)
+
+private val ForestDark = darkColorScheme(
+    primary = Color(0xFF7AD9A5),
+    onPrimary = Color(0xFF003823),
+    primaryContainer = Color(0xFF00513A),
+    onPrimaryContainer = Color(0xFFA5F0C7),
+    secondary = Color(0xFFB5CCBE),
+    onSecondary = Color(0xFF20332A),
+    secondaryContainer = Color(0xFF37493F),
+    onSecondaryContainer = Color(0xFFD1E7D8),
+    tertiary = Color(0xFFA5CBD9),
+    onTertiary = Color(0xFF053544),
+    tertiaryContainer = Color(0xFF224C5C),
+    onTertiaryContainer = Color(0xFFBFE7F9),
+    background = Color(0xFF181D1B),
+    surface = Color(0xFF181D1B),
+    surfaceVariant = Color(0xFF414941),
+    onSurface = Color(0xFFE0E3E0),
+    onSurfaceVariant = Color(0xFFC0C8C1),
+    outline = Color(0xFF8A938C)
+)
+
+// Violet preset - purple tones
+private val VioletLight = lightColorScheme(
+    primary = Color(0xFF6C4DC4),
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = Color(0xFFE6DFFF),
+    onPrimaryContainer = Color(0xFF21005A),
+    secondary = Color(0xFF605D70),
+    onSecondary = Color(0xFFFFFFFF),
+    secondaryContainer = Color(0xFFE7E0F5),
+    onSecondaryContainer = Color(0xFF1B1929),
+    tertiary = Color(0xFF7C5266),
+    onTertiary = Color(0xFFFFFFFF),
+    tertiaryContainer = Color(0xFFFFD9E6),
+    onTertiaryContainer = Color(0xFF2F1223),
+    background = Color(0xFFFAF8FF),
+    surface = Color(0xFFFAF8FF),
+    surfaceVariant = Color(0xFFE6E0EC),
+    onSurface = Color(0xFF1D1B20),
+    onSurfaceVariant = Color(0xFF494552),
+    outline = Color(0xFF7A7583)
+)
+
+private val VioletDark = darkColorScheme(
+    primary = Color(0xFFCFBCFF),
+    onPrimary = Color(0xFF37008F),
+    primaryContainer = Color(0xFF4F3A95),
+    onPrimaryContainer = Color(0xFFE6DFFF),
+    secondary = Color(0xFFC9C3DA),
+    onSecondary = Color(0xFF312E3F),
+    secondaryContainer = Color(0xFF484556),
+    onSecondaryContainer = Color(0xFFE7E0F5),
+    tertiary = Color(0xFFEFB8C8),
+    onTertiary = Color(0xFF4B2537),
+    tertiaryContainer = Color(0xFF653C4F),
+    onTertiaryContainer = Color(0xFFFFD9E6),
+    background = Color(0xFF1D1B20),
+    surface = Color(0xFF1D1B20),
+    surfaceVariant = Color(0xFF494552),
+    onSurface = Color(0xFFE6E1E9),
+    onSurfaceVariant = Color(0xFFCAC4D2),
+    outline = Color(0xFF948F9E)
+)
+
+// Coral preset - warm coral tones
+private val CoralLight = lightColorScheme(
+    primary = Color(0xFFB5442C),
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = Color(0xFFFFDBD0),
+    onPrimaryContainer = Color(0xFF3C0500),
+    secondary = Color(0xFF76574E),
+    onSecondary = Color(0xFFFFFFFF),
+    secondaryContainer = Color(0xFFFFDBCF),
+    onSecondaryContainer = Color(0xFF2C150E),
+    tertiary = Color(0xFF6D5C2F),
+    onTertiary = Color(0xFFFFFFFF),
+    tertiaryContainer = Color(0xFFF7E2A8),
+    onTertiaryContainer = Color(0xFF231B00),
+    background = Color(0xFFFFF9F7),
+    surface = Color(0xFFFFF9F7),
+    surfaceVariant = Color(0xFFF3DCD3),
+    onSurface = Color(0xFF201A18),
+    onSurfaceVariant = Color(0xFF51443F),
+    outline = Color(0xFF837370)
+)
+
+private val CoralDark = darkColorScheme(
+    primary = Color(0xFFFFB4A0),
+    onPrimary = Color(0xFF690F00),
+    primaryContainer = Color(0xFF8F2B17),
+    onPrimaryContainer = Color(0xFFFFDBD0),
+    secondary = Color(0xFFE5BEB1),
+    onSecondary = Color(0xFF442A21),
+    secondaryContainer = Color(0xFF5D4038),
+    onSecondaryContainer = Color(0xFFFFDBCF),
+    tertiary = Color(0xFFDEC791),
+    onTertiary = Color(0xFF3C2F00),
+    tertiaryContainer = Color(0xFF54451A),
+    onTertiaryContainer = Color(0xFFF7E2A8),
+    background = Color(0xFF201A18),
+    surface = Color(0xFF201A18),
+    surfaceVariant = Color(0xFF51443F),
+    onSurface = Color(0xFFECDEDA),
+    onSurfaceVariant = Color(0xFFD5C3BD),
+    outline = Color(0xFF9E8D88)
+)
+
+// Slate preset - neutral blue-grey tones
+private val SlateLight = lightColorScheme(
+    primary = Color(0xFF4C5F70),
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = Color(0xFFCFE3F6),
+    onPrimaryContainer = Color(0xFF041D2C),
+    secondary = Color(0xFF56616B),
+    onSecondary = Color(0xFFFFFFFF),
+    secondaryContainer = Color(0xFFDAE4EE),
+    onSecondaryContainer = Color(0xFF131E27),
+    tertiary = Color(0xFF6A566F),
+    onTertiary = Color(0xFFFFFFFF),
+    tertiaryContainer = Color(0xFFF0DDF3),
+    onTertiaryContainer = Color(0xFF25132A),
+    background = Color(0xFFF7F9FB),
+    surface = Color(0xFFF7F9FB),
+    surfaceVariant = Color(0xFFDBE2E9),
+    onSurface = Color(0xFF1A1C1E),
+    onSurfaceVariant = Color(0xFF41484D),
+    outline = Color(0xFF71787E)
+)
+
+private val SlateDark = darkColorScheme(
+    primary = Color(0xFFB3C7DB),
+    onPrimary = Color(0xFF1B3243),
+    primaryContainer = Color(0xFF33485A),
+    onPrimaryContainer = Color(0xFFCFE3F6),
+    secondary = Color(0xFFBEC8D2),
+    onSecondary = Color(0xFF28333C),
+    secondaryContainer = Color(0xFF3F4954),
+    onSecondaryContainer = Color(0xFFDAE4EE),
+    tertiary = Color(0xFFD3C1D6),
+    onTertiary = Color(0xFF3A2840),
+    tertiaryContainer = Color(0xFF523F58),
+    onTertiaryContainer = Color(0xFFF0DDF3),
+    background = Color(0xFF1A1C1E),
+    surface = Color(0xFF1A1C1E),
+    surfaceVariant = Color(0xFF41484D),
+    onSurface = Color(0xFFE1E2E5),
+    onSurfaceVariant = Color(0xFFC0C7CE),
+    outline = Color(0xFF8A9198)
+)
+
 fun getColorScheme(preset: com.gncal.app.data.ColorPreset, isDark: Boolean) = when (preset) {
     com.gncal.app.data.ColorPreset.AMBER -> if (isDark) AmberDark else AmberLight
     com.gncal.app.data.ColorPreset.OCEAN -> if (isDark) OceanDark else OceanLight
     com.gncal.app.data.ColorPreset.MINT -> if (isDark) MintDark else MintLight
     com.gncal.app.data.ColorPreset.ROSE -> if (isDark) RoseDark else RoseLight
+    com.gncal.app.data.ColorPreset.FOREST -> if (isDark) ForestDark else ForestLight
+    com.gncal.app.data.ColorPreset.VIOLET -> if (isDark) VioletDark else VioletLight
+    com.gncal.app.data.ColorPreset.CORAL -> if (isDark) CoralDark else CoralLight
+    com.gncal.app.data.ColorPreset.SLATE -> if (isDark) SlateDark else SlateLight
 }

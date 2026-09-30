@@ -9,21 +9,20 @@ import androidx.compose.ui.unit.sp
 import com.gncal.app.R
 
 /**
- * 应用字族：拉丁字母与数字用 IBM Plex Sans，中文用思源宋体（Noto Serif SC）。
+ * 应用字族：IBM Plex Sans（拉丁字母与数字）。
  *
- * 两个字体已按字重**合并进同一个字体文件**（见 .toolchain/merge_font.py）：
- * - Compose 的 FontFamily 回退链在多数设备上按顺序取字形，
- *   若中西文分拆成两个字体，中文会永远命中同一个字重，
- *   「大标题粗体 / 小标题细体」就无法生效；
- * - 合并后每个字重一个文件，字重由 TextStyle 精确匹配，中西文各取自己字形；
- * - 字符按应用实际用到的文案做子集（中文 518 字 + 拉丁/符号 304 个），
- *   每个字重约 214 KB，四个字重合计约 0.9 MB。
+ * v1.4.1 起中文回退为系统默认字体：IBM Plex Sans 本身不含中日韩字形，
+ * 缺失字符由 Android 字体回退链补齐（v1.4.0 曾合并思源宋体，现已回退）。
+ *
+ * 字体由 .toolchain/build_plex_font.py 从可变字体实例化并子集化：
+ * - 四个字重各自独立文件，TextStyle 的字重可被精确匹配；
+ * - 仅保留应用会渲染的 245 个拉丁/符号字形，每字重约 51 KB。
  */
 val GnFontFamily = FontFamily(
-    Font(R.font.gn_font_light, FontWeight.Light),    // 300 细体：小标题
-    Font(R.font.gn_font_regular, FontWeight.Normal), // 400 常规：正文
-    Font(R.font.gn_font_medium, FontWeight.Medium),  // 500 中等：按钮与标签
-    Font(R.font.gn_font_bold, FontWeight.Bold)       // 700 粗体：大标题与结果数字
+    Font(R.font.ibm_plex_sans_light, FontWeight.Light),    // 300 细体：小标题
+    Font(R.font.ibm_plex_sans_regular, FontWeight.Normal), // 400 常规：正文
+    Font(R.font.ibm_plex_sans_medium, FontWeight.Medium),  // 500 中等：按钮与标签
+    Font(R.font.ibm_plex_sans_bold, FontWeight.Bold)       // 700 粗体：大标题与结果数字
 )
 
 /**

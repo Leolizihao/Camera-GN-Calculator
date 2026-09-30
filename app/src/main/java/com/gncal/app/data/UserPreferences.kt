@@ -23,7 +23,8 @@ enum class LanguageMode { SYSTEM, CHINESE, ENGLISH, TRADITIONAL_CHINESE }
 
 enum class FontSizeMode { SYSTEM, COMPACT, LARGE }
 
-enum class ColorPreset { AMBER, OCEAN, MINT, ROSE }
+/** 配色方案。新增值必须追加在末尾，避免改变已存储用户的序号。 */
+enum class ColorPreset { AMBER, OCEAN, MINT, ROSE, FOREST, VIOLET, CORAL, SLATE }
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "gncal_settings")
 
