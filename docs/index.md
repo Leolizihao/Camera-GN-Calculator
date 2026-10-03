@@ -1,6 +1,6 @@
 # GN 闪光曝光计算器
 
-![Version](https://img.shields.io/badge/Version-1.5.0-blue)
+![Version](https://img.shields.io/badge/Version-1.5.1-blue)
 ![Platform](https://img.shields.io/badge/Platform-Android%2016%20(API%2036)-3DDC84?logo=android)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.4.20-7F52FF?logo=kotlin)
 ![Compose](https://img.shields.io/badge/UI-Jetpack%20Compose%20%2B%20Material%203-4285F4?logo=jetpackcompose)
@@ -82,20 +82,20 @@
 
 ## 下载安装
 
-从仓库的 **Releases** 页面下载最新版本 **v1.5.0**：
+从仓库的 **Releases** 页面下载最新版本 **v1.5.1**：
 
 | 文件 | 大小 | 说明 |
 | --- | --- | --- |
-| `GNCal-v1.5.0-release.apk` | 7.49 MB | 侧载安装用，V2 + V3 签名（含 v4 `.idsig`） |
-| `GNCal-v1.5.0-release.aab` | 19.53 MB | 含 code transparency 的 App Bundle |
+| `GNCal-v1.5.1-release.apk` | 7.49 MB | 侧载安装用，V2 + V3 签名（含 v4 `.idsig`） |
+| `GNCal-v1.5.1-release.aab` | 19.54 MB | 含 code transparency 的 App Bundle |
 | `transparency.cert` | < 1 KB | 代码透明度公钥证书，供独立校验 |
 
 ```
-APK SHA-256: DBB3B01DE9EFC1815167BBEDFFB1250A2C586A87EEF7A6674902194D2676514C
+APK SHA-256: 813FBD37C1F1CBB6BEAB72738C6D6CAAF83721B2EEAE7D298C3A543A278624FF
 ```
 
 ```powershell
-adb install -r GNCal-v1.5.0-release.apk
+adb install -r GNCal-v1.5.1-release.apk
 ```
 
 | 项目 | 值 |
@@ -105,7 +105,7 @@ adb install -r GNCal-v1.5.0-release.apk
 | targetSdkVersion | **36（Android 16）** |
 | 权限 | **仅 `VIBRATE`（普通权限，安装即授予）** |
 | 签名证书 SHA-256 | `9493CBED…40EB458DB`（RSA 2048，永久固定） |
-| 历史版本 | v1.0.0（7.33 MB）、v1.1.0（7.36 MB）、v1.2.0（7.36 MB）、v1.3.0（7.38 MB）、v1.4.0（7.90 MB）、v1.4.1（7.48 MB） |
+| 历史版本 | v1.0.0（7.33 MB）、v1.1.0（7.36 MB）、v1.2.0（7.36 MB）、v1.3.0（7.38 MB）、v1.4.0（7.90 MB）、v1.4.1（7.48 MB）、v1.5.0（7.49 MB） |
 
 > 侧载安装的"Play 保护机制扫描"提示由设备端触发，开发者无法关闭；
 > 本项目通过完整签名方案、最小化权限（仅普通权限 `VIBRATE`）与可验证凭据把拦截概率降到最低。
@@ -165,6 +165,7 @@ app/src/main/res/
 
 ## 变更记录
 
+- [v1.5.1](../CHANGELOG-v1.5.1.md)：修复滑动时顶部按钮滞后、快速点按按钮卡顿与滑动掉帧
 - [v1.5.0](../CHANGELOG-v1.5.0.md)：触感反馈（开关 + 强度调节）、主页四页左右滑动切换
 - [v1.4.1](../CHANGELOG-v1.4.1.md)：中文回退系统默认字体、新增松林绿/紫罗兰/珊瑚橙/石墨灰四套配色
 - [v1.4.0](../CHANGELOG-v1.4.md)：移除玻璃风格、IBM Plex Sans + 思源宋体合并字体、新增繁体中文、零权限

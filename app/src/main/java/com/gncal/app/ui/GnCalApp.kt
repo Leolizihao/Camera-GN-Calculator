@@ -114,26 +114,41 @@ private fun GnCalAppContent(preferences: UserPreferencesRepository, modifier: Mo
         SolveMode.entries.size
     }
 
+    // 正在进行中的「程序发起」滚动数量：> 0 时抑制滑动途中的触感反馈，
+    // 避免点击按钮后每经过一个中间页都震一次
+    val programmaticScrolls = remember { mutableStateOf(0) }
+
     LaunchedEffect(hapticEnabled, hapticIntensity) {
         haptics.configure(hapticEnabled, hapticIntensity)
     }
 
+    // Pager -> mode：读 currentPage（跨过页面中线即更新），而不是 settledPage。
+    // settledPage 要等惯性动画完全停稳才变，顶部按钮因此慢半拍。
     LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.settledPage }
+        snapshotFlow { pagerState.currentPage }
             .distinctUntilChanged()
             .collect { page ->
                 val pageMode = SolveMode.entries[page]
                 if (calculatorState.mode != pageMode) {
                     calculatorState.mode = pageMode
-                    haptics.perform(HapticEvent.SELECT)
+                    if (programmaticScrolls.value == 0) haptics.perform(HapticEvent.SELECT)
                 }
             }
     }
 
-    LaunchedEffect(calculatorState.mode) {
-        val target = calculatorState.mode.ordinal
-        if (pagerState.currentPage != target) {
-            pagerState.animateScrollToPage(target)
+    // mode -> Pager：只在点击按钮 / 重置时发起，不再用 LaunchedEffect(mode) 反推滚动。
+    // 否则点按第二个按钮会取消上一段动画并从中间位置重启动画，产生迟滞与卡顿。
+    fun scrollToMode(mode: SolveMode, haptic: Boolean = true) {
+        val target = mode.ordinal
+        if (target == pagerState.currentPage && !pagerState.isScrollInProgress) return
+        if (haptic) haptics.perform(HapticEvent.SELECT)
+        programmaticScrolls.value++
+        scope.launch {
+            try {
+                pagerState.animateScrollToPage(target)
+            } finally {
+                programmaticScrolls.value--
+            }
         }
     }
 
@@ -202,6 +217,7 @@ private fun GnCalAppContent(preferences: UserPreferencesRepository, modifier: Mo
                                     onClick = {
                                         menuExpanded = false
                                         haptics.perform(HapticEvent.CONFIRM)
+                                        scrollToMode(SolveMode.APERTURE, haptic = false)
                                         calculatorState.reset()
                                     }
                                 )
@@ -212,12 +228,10 @@ private fun GnCalAppContent(preferences: UserPreferencesRepository, modifier: Mo
                             scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer
                         )
                     )
+                    // 选中态直接读 pagerState，与滑动同帧刷新
                     ModeNavigation(
-                        selectedMode = calculatorState.mode,
-                        onModeChange = { mode ->
-                            if (mode != calculatorState.mode) haptics.perform(HapticEvent.SELECT)
-                            calculatorState.mode = mode
-                        }
+                        selectedMode = SolveMode.entries[pagerState.currentPage],
+                        onModeChange = { scrollToMode(it) }
                     )
                     Text(
                         text = stringResource(R.string.hint_swipe_pages),
@@ -232,6 +246,8 @@ private fun GnCalAppContent(preferences: UserPreferencesRepository, modifier: Mo
         when (destination) {
             Destination.CALCULATOR -> HorizontalPager(
                 state = pagerState,
+                // 预加载相邻页，避免滑到新页时首帧才组合造成掉帧
+                beyondViewportPageCount = 1,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 CalculatorScreen(

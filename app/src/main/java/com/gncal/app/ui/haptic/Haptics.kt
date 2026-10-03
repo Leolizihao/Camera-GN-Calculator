@@ -2,6 +2,7 @@ package com.gncal.app.ui.haptic
 
 import android.content.Context
 import android.os.Build
+import android.os.SystemClock
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
@@ -33,6 +34,7 @@ class Haptics(private val context: Context?) {
 
     private var enabled: Boolean = true
     private var intensity: Int = DEFAULT_INTENSITY
+    private var lastVibrationAtMs: Long = 0L
 
     fun configure(enabled: Boolean, intensity: Int) {
         this.enabled = enabled
@@ -42,6 +44,11 @@ class Haptics(private val context: Context?) {
     fun perform(event: HapticEvent) {
         val vibrator = context?.let(::resolveVibrator) ?: return
         if (!enabled || !vibrator.hasVibrator()) return
+
+        // 节流：连点按钮或快速拖动滑杆时不让振动器被高频调用，避免主线程抖动
+        val now = SystemClock.elapsedRealtime()
+        if (now - lastVibrationAtMs < MIN_INTERVAL_MS) return
+        lastVibrationAtMs = now
 
         val scale = intensity / 100f
         val amplitude = if (vibrator.hasAmplitudeControl()) {
@@ -67,6 +74,7 @@ class Haptics(private val context: Context?) {
 
     companion object {
         const val DEFAULT_INTENSITY = 55
+        private const val MIN_INTERVAL_MS = 25L
     }
 }
 
