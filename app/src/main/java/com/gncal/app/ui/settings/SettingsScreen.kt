@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -48,6 +49,8 @@ import com.gncal.app.data.ThemeMode
 import com.gncal.app.model.FlashCalculator
 import com.gncal.app.model.FlashProfile
 import com.gncal.app.ui.calc.SectionCard
+import com.gncal.app.ui.haptic.HapticEvent
+import com.gncal.app.ui.haptic.LocalHaptics
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,12 +60,16 @@ fun SettingsScreen(
     language: LanguageMode,
     fontSize: FontSizeMode,
     colorPreset: ColorPreset,
+    hapticEnabled: Boolean = true,
+    hapticIntensity: Int = 55,
     flashProfiles: List<FlashProfile>,
     onThemeModeChange: (ThemeMode) -> Unit,
     onDynamicColorChange: (Boolean) -> Unit,
     onLanguageChange: (LanguageMode) -> Unit,
     onFontSizeChange: (FontSizeMode) -> Unit,
     onColorPresetChange: (ColorPreset) -> Unit,
+    onHapticEnabledChange: (Boolean) -> Unit = {},
+    onHapticIntensityChange: (Int) -> Unit = {},
     onAddFlashProfile: (String, Double) -> Unit,
     onUpdateFlashProfile: (FlashProfile) -> Unit,
     onDeleteFlashProfile: (String) -> Unit,
@@ -71,6 +78,7 @@ fun SettingsScreen(
 ) {
     var addingFlash by remember { mutableStateOf(false) }
     var editingFlash by remember { mutableStateOf<FlashProfile?>(null) }
+    val haptics = LocalHaptics.current
 
     Scaffold(
         modifier = modifier,
@@ -187,6 +195,70 @@ fun SettingsScreen(
                             onClick = { onColorPresetChange(preset) }
                         )
                     }
+                }
+            }
+
+            // Haptics
+            SectionCard(title = stringResource(R.string.settings_haptics)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.pref_haptics_enable),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = stringResource(R.string.pref_haptics_enable_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(checked = hapticEnabled, onCheckedChange = onHapticEnabledChange)
+                }
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.pref_haptics_intensity),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (hapticEnabled) MaterialTheme.colorScheme.onSurface
+                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                    )
+                    Text(
+                        text = if (hapticEnabled) {
+                            "$hapticIntensity%"
+                        } else {
+                            stringResource(R.string.pref_haptics_disabled)
+                        },
+                        style = MaterialTheme.typography.titleMedium,
+                        color = if (hapticEnabled) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Slider(
+                    value = hapticIntensity.toFloat(),
+                    onValueChange = { onHapticIntensityChange(it.toInt()) },
+                    valueRange = 0f..100f,
+                    steps = 9,
+                    enabled = hapticEnabled,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                TextButton(
+                    onClick = { haptics.perform(HapticEvent.CONFIRM) },
+                    enabled = hapticEnabled,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.pref_haptics_test))
                 }
             }
 

@@ -17,8 +17,8 @@ android {
         minSdk = 26
         // Android 16（API 36）为目标平台，启用 edge-to-edge、预测返回等新特性
         targetSdk = 36
-        versionCode = 6
-        versionName = "1.4.1"
+        versionCode = 7
+        versionName = "1.5.0"
     }
 
     // 签名配置：读取根目录 keystore.properties；若文件不存在则回退到调试签名，

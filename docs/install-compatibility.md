@@ -60,7 +60,7 @@ Play 保护机制的启发式重点盯以下特征，本项目逐项规避：
 
 | 风险特征 | 本项目状态 |
 | --- | --- |
-| 短信 / 通话 / 联系人权限 | ✅ **零权限**（v1.3.0 移除了未使用的 `VIBRATE`） |
+| 短信 / 通话 / 联系人权限 | ✅ **无** |
 | 无障碍服务、设备管理器 | ✅ 无 |
 | `REQUEST_INSTALL_PACKAGES`（自我更新） | ✅ 无 |
 | 动态加载外部代码 / 热更新 / 插件化 | ✅ 无 |
@@ -68,7 +68,10 @@ Play 保护机制的启发式重点盯以下特征，本项目逐项规避：
 | 第三方 SDK / 追踪库 | ✅ 无（仅 androidx + Compose） |
 | 混淆后仍保留可读结构 | ✅ R8 仅做优化与瘦身，不改变行为 |
 
-`AndroidManifest` 中无任何 `<uses-permission>`，这是最有效的加分项。
+v1.5.0 起清单中仅有一条 `android.permission.VIBRATE`（用于触感反馈）。
+它属于**普通权限**：安装时自动授予、不弹窗、不读取任何数据，
+不在 Play 保护机制的敏感权限清单内，因此不影响风险判定。
+除它以外无任何 `<uses-permission>`，这仍是最有效的加分项。
 
 > 构建产物中会出现一条 `com.gncal.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`：
 > 它由 AndroidX Core 自动生成（`protectionLevel="signature"`，仅本应用可用），
@@ -125,8 +128,8 @@ apksigner verify --verbose --print-certs dist/GNCal-v1.3.0-release.apk
 # 2. 校验和
 Get-FileHash dist/GNCal-v1.3.0-release.apk -Algorithm SHA256
 
-# 3. 权限审计（应为空）
-aapt2 dump permissions dist/GNCal-v1.3.0-release.apk   # 或 apkanalyzer manifest permissions
+# 3. 权限审计（应仅有 VIBRATE）
+aapt2 dump permissions dist/GNCal-v1.5.0-release.apk   # 或 apkanalyzer manifest permissions
 
 # 4. 单测
 ./gradlew :app:testDebugUnitTest
@@ -142,7 +145,7 @@ aapt2 dump permissions dist/GNCal-v1.3.0-release.apk   # 或 apkanalyzer manifes
 | v2 签名 | ✅ |
 | v3 签名 | ✅ |
 | v4 / .idsig | ✅ |
-| 零权限 | ✅ |
+| 权限最小化（仅 VIBRATE 普通权限） | ✅ |
 | minSdk 26 / targetSdk 36 | ✅ |
 | 16KB 页适配 | ✅ |
 | code transparency（AAB） | ✅ |

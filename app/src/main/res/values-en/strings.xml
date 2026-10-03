@@ -51,6 +51,14 @@
     <string name="preset_coral">Coral</string>
     <string name="preset_slate">Slate</string>
 
+    <string name="settings_haptics">Haptics</string>
+    <string name="pref_haptics_enable">Enable haptics</string>
+    <string name="pref_haptics_enable_desc">Vibration feedback when switching modes, adjusting stops or units</string>
+    <string name="pref_haptics_intensity">Vibration intensity</string>
+    <string name="pref_haptics_test">Test</string>
+    <string name="pref_haptics_disabled">Off</string>
+    <string name="hint_swipe_pages">Swipe left or right to switch between the four solver modes</string>
+
     <string name="mode_aperture">Aperture</string>
     <string name="mode_distance">Distance</string>
     <string name="mode_gn">GN</string>

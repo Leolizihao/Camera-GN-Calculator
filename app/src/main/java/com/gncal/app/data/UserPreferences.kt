@@ -39,6 +39,8 @@ class UserPreferencesRepository(private val context: Context) {
         val LANGUAGE = intPreferencesKey("language")
         val FONT_SIZE = intPreferencesKey("font_size")
         val COLOR_PRESET = intPreferencesKey("color_preset")
+        val HAPTIC_ENABLED = booleanPreferencesKey("haptic_enabled")
+        val HAPTIC_INTENSITY = intPreferencesKey("haptic_intensity")
         val FLASH_PROFILES = stringPreferencesKey("flash_profiles")
     }
 
@@ -66,6 +68,14 @@ class UserPreferencesRepository(private val context: Context) {
 
     val colorPreset: Flow<ColorPreset> = context.dataStore.data.map { prefs ->
         ColorPreset.entries.getOrElse(prefs[Keys.COLOR_PRESET] ?: 0) { ColorPreset.AMBER }
+    }
+
+    val hapticEnabled: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[Keys.HAPTIC_ENABLED] ?: true
+    }
+
+    val hapticIntensity: Flow<Int> = context.dataStore.data.map { prefs ->
+        (prefs[Keys.HAPTIC_INTENSITY] ?: 55).coerceIn(0, 100)
     }
 
     val flashProfiles: Flow<List<FlashProfile>> = context.dataStore.data.map { prefs ->
@@ -98,6 +108,14 @@ class UserPreferencesRepository(private val context: Context) {
 
     suspend fun setColorPreset(preset: ColorPreset) {
         context.dataStore.edit { it[Keys.COLOR_PRESET] = preset.ordinal }
+    }
+
+    suspend fun setHapticEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[Keys.HAPTIC_ENABLED] = enabled }
+    }
+
+    suspend fun setHapticIntensity(intensity: Int) {
+        context.dataStore.edit { it[Keys.HAPTIC_INTENSITY] = intensity.coerceIn(0, 100) }
     }
 
     suspend fun addFlashProfile(name: String, guideNumber: Double) {

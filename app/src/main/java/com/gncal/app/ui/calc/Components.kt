@@ -24,6 +24,10 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +36,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.gncal.app.R
+import com.gncal.app.ui.haptic.HapticEvent
+import com.gncal.app.ui.haptic.LocalHaptics
+import kotlin.math.abs
 
 /** 提示级别：决定提示卡片的配色 */
 enum class HintLevel { INFO, TIP, WARNING }
@@ -116,6 +123,18 @@ fun SteppedSliderRow(
     enabled: Boolean = true,
     caption: String? = null
 ) {
+    val haptics = LocalHaptics.current
+    // 每跨过一个档位（连续滑杆则每跨过一个整数单位）给一次轻微触感，避免拖动手抖式连震
+    val stepSize = ((valueRange.endInclusive - valueRange.start) / (steps + 1))
+        .takeIf { it > 0f } ?: 1f
+    var lastTickValue by remember(valueRange, steps) { mutableFloatStateOf(value) }
+    val tickIfNeeded: (Float) -> Unit = { next ->
+        if (abs(next - lastTickValue) >= stepSize - 0.0001f) {
+            lastTickValue = next
+            haptics.perform(HapticEvent.TICK)
+        }
+    }
+
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -136,7 +155,14 @@ fun SteppedSliderRow(
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { onValueChange((value - 1).coerceIn(valueRange)) }, enabled = enabled) {
+            IconButton(
+                onClick = {
+                    val next = (value - 1).coerceIn(valueRange)
+                    tickIfNeeded(next)
+                    onValueChange(next)
+                },
+                enabled = enabled
+            ) {
                 Icon(
                     imageVector = Icons.Outlined.Remove,
                     contentDescription = stringResource(R.string.cd_decrease),
@@ -145,13 +171,24 @@ fun SteppedSliderRow(
             }
             Slider(
                 value = value,
-                onValueChange = { onValueChange(it.coerceIn(valueRange)) },
+                onValueChange = {
+                    val next = it.coerceIn(valueRange)
+                    tickIfNeeded(next)
+                    onValueChange(next)
+                },
                 valueRange = valueRange,
                 steps = steps,
                 enabled = enabled,
                 modifier = Modifier.weight(1f)
             )
-            IconButton(onClick = { onValueChange((value + 1).coerceIn(valueRange)) }, enabled = enabled) {
+            IconButton(
+                onClick = {
+                    val next = (value + 1).coerceIn(valueRange)
+                    tickIfNeeded(next)
+                    onValueChange(next)
+                },
+                enabled = enabled
+            ) {
                 Icon(
                     imageVector = Icons.Outlined.Add,
                     contentDescription = stringResource(R.string.cd_increase),

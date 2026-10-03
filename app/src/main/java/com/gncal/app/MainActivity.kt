@@ -8,6 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gncal.app.data.ColorPreset
 import com.gncal.app.data.FontSizeMode
@@ -15,6 +17,7 @@ import com.gncal.app.data.LanguageMode
 import com.gncal.app.data.ThemeMode
 import com.gncal.app.data.UserPreferencesRepository
 import com.gncal.app.ui.GnCalApp
+import com.gncal.app.ui.haptic.Haptics
 import com.gncal.app.ui.theme.GnCalTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -37,6 +40,9 @@ class MainActivity : ComponentActivity() {
             val fontSize by preferences.fontSize.collectAsStateWithLifecycle(FontSizeMode.SYSTEM)
             val language by preferences.language.collectAsStateWithLifecycle(LanguageMode.SYSTEM)
 
+            val context = LocalContext.current
+            val haptics = remember { Haptics(context) }
+
             GnCalTheme(
                 themeMode = themeMode,
                 dynamicColor = dynamicColor,
@@ -44,7 +50,7 @@ class MainActivity : ComponentActivity() {
                 fontSize = fontSize,
                 language = language
             ) {
-                GnCalApp(preferences = preferences)
+                GnCalApp(preferences = preferences, haptics = haptics)
             }
         }
     }

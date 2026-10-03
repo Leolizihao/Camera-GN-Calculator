@@ -2,12 +2,15 @@ package com.gncal.app.ui
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -37,11 +40,14 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
@@ -60,17 +66,37 @@ import com.gncal.app.model.FlashProfile
 import com.gncal.app.model.SolveMode
 import com.gncal.app.ui.calc.CalculatorScreen
 import com.gncal.app.ui.calc.rememberCalculatorState
+import com.gncal.app.ui.haptic.HapticEvent
+import com.gncal.app.ui.haptic.Haptics
+import com.gncal.app.ui.haptic.LocalHaptics
 import com.gncal.app.ui.settings.SettingsScreen
 
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 
 enum class Destination { CALCULATOR, SETTINGS }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
-fun GnCalApp(preferences: UserPreferencesRepository, modifier: Modifier = Modifier) {
+fun GnCalApp(
+    preferences: UserPreferencesRepository,
+    haptics: Haptics = Haptics(null),
+    modifier: Modifier = Modifier
+) {
+    CompositionLocalProvider(LocalHaptics provides haptics) {
+        GnCalAppContent(preferences = preferences, modifier = modifier)
+    }
+}
+
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3WindowSizeClassApi::class,
+    ExperimentalFoundationApi::class
+)
+@Composable
+private fun GnCalAppContent(preferences: UserPreferencesRepository, modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
+    val haptics = LocalHaptics.current
     val calculatorState = rememberCalculatorState()
 
     val unit by preferences.distanceUnit.collectAsStateWithLifecycle(DistanceUnit.METER)
@@ -79,7 +105,37 @@ fun GnCalApp(preferences: UserPreferencesRepository, modifier: Modifier = Modifi
     val language by preferences.language.collectAsStateWithLifecycle(LanguageMode.SYSTEM)
     val fontSize by preferences.fontSize.collectAsStateWithLifecycle(FontSizeMode.SYSTEM)
     val colorPreset by preferences.colorPreset.collectAsStateWithLifecycle(ColorPreset.AMBER)
+    val hapticEnabled by preferences.hapticEnabled.collectAsStateWithLifecycle(true)
+    val hapticIntensity by preferences.hapticIntensity.collectAsStateWithLifecycle(Haptics.DEFAULT_INTENSITY)
     val flashProfiles by preferences.flashProfiles.collectAsStateWithLifecycle(FlashProfile.defaults)
+
+    // 主页四个求解模式各占一页，可左右滑动切换；与顶部模式按钮双向同步
+    val pagerState = rememberPagerState(initialPage = calculatorState.mode.ordinal) {
+        SolveMode.entries.size
+    }
+
+    LaunchedEffect(hapticEnabled, hapticIntensity) {
+        haptics.configure(hapticEnabled, hapticIntensity)
+    }
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }
+            .distinctUntilChanged()
+            .collect { page ->
+                val pageMode = SolveMode.entries[page]
+                if (calculatorState.mode != pageMode) {
+                    calculatorState.mode = pageMode
+                    haptics.perform(HapticEvent.SELECT)
+                }
+            }
+    }
+
+    LaunchedEffect(calculatorState.mode) {
+        val target = calculatorState.mode.ordinal
+        if (pagerState.currentPage != target) {
+            pagerState.animateScrollToPage(target)
+        }
+    }
 
     var destination by rememberSaveable { mutableStateOf(Destination.CALCULATOR) }
     var showFormulaSheet by rememberSaveable { mutableStateOf(false) }
@@ -143,7 +199,11 @@ fun GnCalApp(preferences: UserPreferencesRepository, modifier: Modifier = Modifi
                                     leadingIcon = {
                                         Icon(Icons.Outlined.RestartAlt, contentDescription = null)
                                     },
-                                    onClick = { menuExpanded = false; calculatorState.reset() }
+                                    onClick = {
+                                        menuExpanded = false
+                                        haptics.perform(HapticEvent.CONFIRM)
+                                        calculatorState.reset()
+                                    }
                                 )
                             }
                         },
@@ -154,27 +214,47 @@ fun GnCalApp(preferences: UserPreferencesRepository, modifier: Modifier = Modifi
                     )
                     ModeNavigation(
                         selectedMode = calculatorState.mode,
-                        onModeChange = { calculatorState.mode = it }
+                        onModeChange = { mode ->
+                            if (mode != calculatorState.mode) haptics.perform(HapticEvent.SELECT)
+                            calculatorState.mode = mode
+                        }
+                    )
+                    Text(
+                        text = stringResource(R.string.hint_swipe_pages),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp)
                     )
                 }
             }
         }
     ) { padding ->
         when (destination) {
-            Destination.CALCULATOR -> CalculatorScreen(
-                unit = unit,
-                onUnitChange = { newUnit -> scope.launch { preferences.setDistanceUnit(newUnit) } },
-                flashProfiles = flashProfiles,
-                expandedLayout = expandedLayout,
-                contentPadding = padding,
-                state = calculatorState
-            )
+            Destination.CALCULATOR -> HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                CalculatorScreen(
+                    unit = unit,
+                    onUnitChange = { newUnit ->
+                        if (newUnit != unit) haptics.perform(HapticEvent.SELECT)
+                        scope.launch { preferences.setDistanceUnit(newUnit) }
+                    },
+                    flashProfiles = flashProfiles,
+                    expandedLayout = expandedLayout,
+                    contentPadding = padding,
+                    state = calculatorState,
+                    mode = SolveMode.entries[page]
+                )
+            }
             Destination.SETTINGS -> SettingsScreen(
                 themeMode = themeMode,
                 dynamicColor = dynamicColor,
                 language = language,
                 fontSize = fontSize,
                 colorPreset = colorPreset,
+                hapticEnabled = hapticEnabled,
+                hapticIntensity = hapticIntensity,
                 flashProfiles = flashProfiles,
                 onThemeModeChange = { scope.launch { preferences.setThemeMode(it) } },
                 onDynamicColorChange = { scope.launch { preferences.setDynamicColor(it) } },
@@ -186,6 +266,8 @@ fun GnCalApp(preferences: UserPreferencesRepository, modifier: Modifier = Modifi
                 },
                 onFontSizeChange = { scope.launch { preferences.setFontSize(it) } },
                 onColorPresetChange = { scope.launch { preferences.setColorPreset(it) } },
+                onHapticEnabledChange = { scope.launch { preferences.setHapticEnabled(it) } },
+                onHapticIntensityChange = { scope.launch { preferences.setHapticIntensity(it) } },
                 onAddFlashProfile = { name, guideNumber ->
                     scope.launch { preferences.addFlashProfile(name, guideNumber) }
                 },

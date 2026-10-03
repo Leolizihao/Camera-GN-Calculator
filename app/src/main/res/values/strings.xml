@@ -51,6 +51,14 @@
     <string name="preset_coral">珊瑚橙</string>
     <string name="preset_slate">石墨灰</string>
 
+    <string name="settings_haptics">振动反馈</string>
+    <string name="pref_haptics_enable">启用振动</string>
+    <string name="pref_haptics_enable_desc">切换模式、调节档位与切换单位时给出触感反馈</string>
+    <string name="pref_haptics_intensity">振动强度</string>
+    <string name="pref_haptics_test">试一试</string>
+    <string name="pref_haptics_disabled">已关闭</string>
+    <string name="hint_swipe_pages">左右滑动可切换四个求解模式</string>
+
     <string name="mode_aperture">求光圈</string>
     <string name="mode_distance">求距离</string>
     <string name="mode_gn">求 GN</string>

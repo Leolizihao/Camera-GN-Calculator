@@ -1,6 +1,6 @@
 # GN 闪光曝光计算器
 
-![Version](https://img.shields.io/badge/Version-1.4.1-blue)
+![Version](https://img.shields.io/badge/Version-1.5.0-blue)
 ![Platform](https://img.shields.io/badge/Platform-Android%2016%20(API%2036)-3DDC84?logo=android)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.4.20-7F52FF?logo=kotlin)
 ![Compose](https://img.shields.io/badge/UI-Jetpack%20Compose%20%2B%20Material%203-4285F4?logo=jetpackcompose)
@@ -30,6 +30,18 @@
 - 实时提示与警告：距离过近/过远、光圈越界、ISO 过高、所需 GN 超范围、同步速度提醒
 - 光圈 — 距离对照表
 - 米 / 英尺一键切换（GN 与距离同步换算）
+
+### 四页滑动切换（v1.5.0）
+
+- 顶部模式按钮下是 `HorizontalPager`，四个求解模式各占一页，**左右滑动即可切换**
+- 与顶部模式按钮双向同步：滑动更新模式、点击按钮平滑滚到对应页
+- 输入值（GN / 光圈 / 距离 / ISO / 功率 / 补偿）在四页间共享，切换模式不丢数据
+
+### 触感反馈（v1.5.0）
+
+- 设置页可开关振动，并用滑杆调节强度（0–100%，10% 一档），附"试一试"预览
+- 触发场景分级：档位跳动 `TICK`（12 ms）、切换模式/单位 `SELECT`（24 ms）、重置确认 `CONFIRM`（40 ms）
+- 强度同时影响振幅（60–255）与时长；无振动硬件的设备自动静默降级
 
 ### 字体（v1.4.1）
 
@@ -70,20 +82,20 @@
 
 ## 下载安装
 
-从仓库的 **Releases** 页面下载最新版本 **v1.4.1**：
+从仓库的 **Releases** 页面下载最新版本 **v1.5.0**：
 
 | 文件 | 大小 | 说明 |
 | --- | --- | --- |
-| `GNCal-v1.4.1-release.apk` | 7.48 MB | 侧载安装用，V2 + V3 签名（含 v4 `.idsig`） |
-| `GNCal-v1.4.1-release.aab` | 19.53 MB | 含 code transparency 的 App Bundle |
+| `GNCal-v1.5.0-release.apk` | 7.49 MB | 侧载安装用，V2 + V3 签名（含 v4 `.idsig`） |
+| `GNCal-v1.5.0-release.aab` | 19.53 MB | 含 code transparency 的 App Bundle |
 | `transparency.cert` | < 1 KB | 代码透明度公钥证书，供独立校验 |
 
 ```
-APK SHA-256: E57AED92463D9E9F93E1D6A6E692F087A02572D8099F90239C52F74E01CABA32
+APK SHA-256: DBB3B01DE9EFC1815167BBEDFFB1250A2C586A87EEF7A6674902194D2676514C
 ```
 
 ```powershell
-adb install -r GNCal-v1.4.1-release.apk
+adb install -r GNCal-v1.5.0-release.apk
 ```
 
 | 项目 | 值 |
@@ -91,12 +103,12 @@ adb install -r GNCal-v1.4.1-release.apk
 | 包名 | `com.gncal.app` |
 | minSdkVersion | 26（Android 8.0+） |
 | targetSdkVersion | **36（Android 16）** |
-| 权限 | **无（零权限）** |
+| 权限 | **仅 `VIBRATE`（普通权限，安装即授予）** |
 | 签名证书 SHA-256 | `9493CBED…40EB458DB`（RSA 2048，永久固定） |
-| 历史版本 | v1.0.0（7.33 MB）、v1.1.0（7.36 MB）、v1.2.0（7.36 MB）、v1.3.0（7.38 MB）、v1.4.0（7.90 MB） |
+| 历史版本 | v1.0.0（7.33 MB）、v1.1.0（7.36 MB）、v1.2.0（7.36 MB）、v1.3.0（7.38 MB）、v1.4.0（7.90 MB）、v1.4.1（7.48 MB） |
 
 > 侧载安装的"Play 保护机制扫描"提示由设备端触发，开发者无法关闭；
-> 本项目通过完整签名方案、零权限与可验证凭据把拦截概率降到最低。
+> 本项目通过完整签名方案、最小化权限（仅普通权限 `VIBRATE`）与可验证凭据把拦截概率降到最低。
 > 完整说明见 [安装稳定性保障](install-compatibility.md)。
 
 ## 自行构建
@@ -153,6 +165,7 @@ app/src/main/res/
 
 ## 变更记录
 
+- [v1.5.0](../CHANGELOG-v1.5.0.md)：触感反馈（开关 + 强度调节）、主页四页左右滑动切换
 - [v1.4.1](../CHANGELOG-v1.4.1.md)：中文回退系统默认字体、新增松林绿/紫罗兰/珊瑚橙/石墨灰四套配色
 - [v1.4.0](../CHANGELOG-v1.4.md)：移除玻璃风格、IBM Plex Sans + 思源宋体合并字体、新增繁体中文、零权限
 - [v1.3.0](../CHANGELOG-v1.3.md)：v3/v4 签名、code transparency（玻璃风格已于 v1.4.0 移除）

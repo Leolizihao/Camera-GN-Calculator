@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- 应用不申请任何权限：零权限可最大限度避免被安全扫描判定为高风险 -->
+    <!-- VIBRATE 为普通权限，安装时自动授予，无需运行时申请 -->
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"

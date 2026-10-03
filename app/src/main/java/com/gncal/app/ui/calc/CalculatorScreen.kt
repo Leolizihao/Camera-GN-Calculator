@@ -116,13 +116,15 @@ fun CalculatorScreen(
     expandedLayout: Boolean,
     contentPadding: PaddingValues,
     state: CalculatorState = rememberCalculatorState(),
+    /** 当前页对应的求解模式（由外层 Pager 指定），输入值在四个页面间共享 */
+    mode: SolveMode,
     modifier: Modifier = Modifier
 ) {
     val gn = state.gnText.toDoubleOrNull()?.takeIf { it > 0.0 }
     val distance = state.distanceText.toDoubleOrNull()?.takeIf { it > 0.0 }
 
     val inputs = FlashInputs(
-        mode = state.mode,
+        mode = mode,
         gnIso100 = gn ?: 0.0,
         apertureIndex = state.apertureIndex,
         distance = distance ?: 0.0,
@@ -147,7 +149,8 @@ fun CalculatorScreen(
                     state = state,
                     unit = unit,
                     flashProfiles = flashProfiles,
-                    onUnitChange = onUnitChange
+                    onUnitChange = onUnitChange,
+                    mode = mode
                 )
             }
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -167,7 +170,8 @@ fun CalculatorScreen(
                 state = state,
                 unit = unit,
                 flashProfiles = flashProfiles,
-                onUnitChange = onUnitChange
+                onUnitChange = onUnitChange,
+                mode = mode
             )
             ResultsPane(inputs = inputs, result = result, unit = unit)
         }
@@ -197,6 +201,7 @@ private fun InputsPane(
     unit: DistanceUnit,
     flashProfiles: List<FlashProfile>,
     onUnitChange: (DistanceUnit) -> Unit,
+    mode: SolveMode,
     modifier: Modifier = Modifier
 ) {
     val solvedLabel = stringResource(R.string.label_solved)
@@ -223,7 +228,7 @@ private fun InputsPane(
             }
 
             // GN
-            if (state.mode == SolveMode.GUIDE_NUMBER) {
+            if (mode == SolveMode.GUIDE_NUMBER) {
                 SolvedRow(label = stringResource(R.string.label_gn))
             } else {
                 FlashProfilePicker(
@@ -250,12 +255,12 @@ private fun InputsPane(
                 valueRange = 0f..(PhotoScales.APERTURES.size - 1).toFloat(),
                 steps = PhotoScales.APERTURES.size - 2,
                 onValueChange = { state.apertureIndex = it.toInt() },
-                enabled = state.mode != SolveMode.APERTURE,
-                caption = if (state.mode == SolveMode.APERTURE) solvedLabel else null
+                enabled = mode != SolveMode.APERTURE,
+                caption = if (mode == SolveMode.APERTURE) solvedLabel else null
             )
 
             // 距离
-            if (state.mode == SolveMode.DISTANCE) {
+            if (mode == SolveMode.DISTANCE) {
                 SolvedRow(label = stringResource(R.string.label_distance))
             } else {
                 NumberField(
@@ -288,8 +293,8 @@ private fun InputsPane(
                 valueRange = 0f..(PhotoScales.ISOS.size - 1).toFloat(),
                 steps = PhotoScales.ISOS.size - 2,
                 onValueChange = { state.isoIndex = it.toInt() },
-                enabled = state.mode != SolveMode.ISO,
-                caption = if (state.mode == SolveMode.ISO) solvedLabel else null
+                enabled = mode != SolveMode.ISO,
+                caption = if (mode == SolveMode.ISO) solvedLabel else null
             )
         }
 
