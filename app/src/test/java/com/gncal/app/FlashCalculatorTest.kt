@@ -1,5 +1,6 @@
 package com.gncal.app
 
+import com.gncal.app.data.IsoMode
 import com.gncal.app.model.Advice
 import com.gncal.app.model.DistanceUnit
 import com.gncal.app.model.FlashCalculator
@@ -27,7 +28,7 @@ class FlashCalculatorTest {
         gnIso100 = gn,
         apertureIndex = PhotoScales.APERTURES.indexOf(aperture),
         distance = distance,
-        isoIndex = PhotoScales.ISOS.indexOf(iso),
+        iso = iso,
         powerIndex = powerIndex,
         compensationIndex = compensationIndex,
         unit = unit
@@ -212,5 +213,81 @@ class FlashCalculatorTest {
         state.convertUnit(DistanceUnit.METER, DistanceUnit.FEET)
         assertEquals("", state.gnText)
         assertEquals("abc", state.distanceText)
+    }
+
+    // ---------- 胶片 ISO 模式 ----------
+
+    @Test
+    fun snapFilmIso_singleDigitsStepByOne() {
+        assertEquals(6, PhotoScales.snapFilmIso(6f))
+        assertEquals(7, PhotoScales.snapFilmIso(6.6f))
+        assertEquals(8, PhotoScales.snapFilmIso(8.4f))
+        assertEquals(9, PhotoScales.snapFilmIso(9f))
+    }
+
+    @Test
+    fun snapFilmIso_snapsToStandardValuesAboveNine() {
+        assertEquals(10, PhotoScales.snapFilmIso(9.6f))
+        assertEquals(10, PhotoScales.snapFilmIso(11f))
+        assertEquals(25, PhotoScales.snapFilmIso(24f))
+        assertEquals(100, PhotoScales.snapFilmIso(96f))
+        assertEquals(400, PhotoScales.snapFilmIso(390f))
+        assertEquals(1600, PhotoScales.snapFilmIso(1500f))
+    }
+
+    @Test
+    fun snapFilmIso_clampsToFilmRange() {
+        assertEquals(PhotoScales.FILM_MIN_ISO, PhotoScales.snapFilmIso(1f))
+        assertEquals(PhotoScales.FILM_MAX_ISO, PhotoScales.snapFilmIso(102400f))
+    }
+
+    @Test
+    fun applyIsoMode_clampsValueIntoNewModeRange() {
+        val state = CalculatorState()
+
+        state.isoValue = 6400
+        state.applyIsoMode(IsoMode.FILM)
+        assertEquals(1600, state.isoValue)
+
+        state.isoValue = 6
+        state.applyIsoMode(IsoMode.EXTENDED)
+        assertEquals(25, state.isoValue)
+
+        state.isoValue = 400
+        state.applyIsoMode(IsoMode.FILM)
+        assertEquals(400, state.isoValue)
+        state.applyIsoMode(IsoMode.EXTENDED)
+        assertEquals(400, state.isoValue)
+    }
+
+    @Test
+    fun filmIsoPosition_isLogarithmicAndRoundTrips() {
+        assertEquals(0f, PhotoScales.filmIsoPosition(6f), 0.01f)
+        assertEquals(100f, PhotoScales.filmIsoPosition(1600f), 0.01f)
+        // ISO 100 应落在轨道中段附近，而不是线性刻度下的最左端
+        assertTrue(PhotoScales.filmIsoPosition(100f) > 45f)
+        assertTrue(PhotoScales.filmIsoPosition(100f) < 55f)
+
+        PhotoScales.FILM_ISO_STOPS.forEach { stop ->
+            assertEquals(
+                stop.toFloat(),
+                PhotoScales.snapFilmIso(
+                    PhotoScales.filmIsoFromPosition(PhotoScales.filmIsoPosition(stop.toFloat()))
+                ).toFloat(),
+                0.01f
+            )
+        }
+    }
+
+    @Test
+    fun filmIsoValues_stillProduceCorrectExposure() {
+        // 胶片模式下可取标准值之间的任意整数（如 ISO 320），曝光计算必须成立
+        val film = FlashCalculator.solve(inputs(SolveMode.DISTANCE, gn = 36.0, aperture = 5.6, iso = 320))
+        // 36 × √(320/100) ÷ 5.6 ≈ 11.5
+        assertEquals(11.5, film.primary.toDouble(), 0.1)
+
+        val low = FlashCalculator.solve(inputs(SolveMode.DISTANCE, gn = 36.0, aperture = 5.6, iso = 6))
+        // 36 × √(6/100) ÷ 5.6 ≈ 1.57
+        assertEquals(1.6, low.primary.toDouble(), 0.1)
     }
 }

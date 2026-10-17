@@ -50,6 +50,10 @@
     <string name="preset_coral">珊瑚橘</string>
     <string name="preset_slate">石墨灰</string>
 
+    <string name="settings_iso_mode">ISO 調整模式</string>
+    <string name="iso_mode_film">膠片 ISO（6–1600）</string>
+    <string name="iso_mode_extended">ISO 拓展（全範圍 25–102400）</string>
+
     <string name="settings_haptics">振動回饋</string>
     <string name="pref_haptics_enable">啟用振動</string>
     <string name="pref_haptics_enable_desc">切換模式、調整檔位與切換單位時提供觸感回饋</string>

@@ -51,6 +51,10 @@
     <string name="preset_coral">Coral</string>
     <string name="preset_slate">Slate</string>
 
+    <string name="settings_iso_mode">ISO range</string>
+    <string name="iso_mode_film">Film ISO (6–1600)</string>
+    <string name="iso_mode_extended">Extended ISO (full 25–102400)</string>
+
     <string name="settings_haptics">Haptics</string>
     <string name="pref_haptics_enable">Enable haptics</string>
     <string name="pref_haptics_enable_desc">Vibration feedback when switching modes, adjusting stops or units</string>

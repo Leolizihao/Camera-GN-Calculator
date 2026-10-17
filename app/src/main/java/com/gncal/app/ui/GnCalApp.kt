@@ -58,6 +58,7 @@ import com.gncal.app.BuildConfig
 import com.gncal.app.R
 import com.gncal.app.data.ColorPreset
 import com.gncal.app.data.FontSizeMode
+import com.gncal.app.data.IsoMode
 import com.gncal.app.data.LanguageMode
 import com.gncal.app.data.ThemeMode
 import com.gncal.app.data.UserPreferencesRepository
@@ -105,6 +106,7 @@ private fun GnCalAppContent(preferences: UserPreferencesRepository, modifier: Mo
     val language by preferences.language.collectAsStateWithLifecycle(LanguageMode.SYSTEM)
     val fontSize by preferences.fontSize.collectAsStateWithLifecycle(FontSizeMode.SYSTEM)
     val colorPreset by preferences.colorPreset.collectAsStateWithLifecycle(ColorPreset.AMBER)
+    val isoMode by preferences.isoMode.collectAsStateWithLifecycle(IsoMode.FILM)
     val hapticEnabled by preferences.hapticEnabled.collectAsStateWithLifecycle(true)
     val hapticIntensity by preferences.hapticIntensity.collectAsStateWithLifecycle(Haptics.DEFAULT_INTENSITY)
     val flashProfiles by preferences.flashProfiles.collectAsStateWithLifecycle(FlashProfile.defaults)
@@ -264,7 +266,8 @@ private fun GnCalAppContent(preferences: UserPreferencesRepository, modifier: Mo
                     expandedLayout = expandedLayout,
                     contentPadding = padding,
                     state = calculatorState,
-                    mode = SolveMode.entries[page]
+                    mode = SolveMode.entries[page],
+                    isoMode = isoMode
                 )
             }
             Destination.SETTINGS -> SettingsScreen(
@@ -273,6 +276,7 @@ private fun GnCalAppContent(preferences: UserPreferencesRepository, modifier: Mo
                 language = language,
                 fontSize = fontSize,
                 colorPreset = colorPreset,
+                isoMode = isoMode,
                 hapticEnabled = hapticEnabled,
                 hapticIntensity = hapticIntensity,
                 flashProfiles = flashProfiles,
@@ -286,6 +290,14 @@ private fun GnCalAppContent(preferences: UserPreferencesRepository, modifier: Mo
                 },
                 onFontSizeChange = { scope.launch { preferences.setFontSize(it) } },
                 onColorPresetChange = { scope.launch { preferences.setColorPreset(it) } },
+                onIsoModeChange = { newMode ->
+                    if (newMode != isoMode) {
+                        haptics.perform(HapticEvent.SELECT)
+                        // 数值立即夹取/吸附到新模式允许的范围，与开关状态保持同步
+                        calculatorState.applyIsoMode(newMode)
+                        scope.launch { preferences.setIsoMode(newMode) }
+                    }
+                },
                 onHapticEnabledChange = { scope.launch { preferences.setHapticEnabled(it) } },
                 onHapticIntensityChange = { scope.launch { preferences.setHapticIntensity(it) } },
                 onAddFlashProfile = { name, guideNumber ->

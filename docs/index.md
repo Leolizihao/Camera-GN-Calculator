@@ -1,6 +1,6 @@
 # GN 闪光曝光计算器
 
-![Version](https://img.shields.io/badge/Version-1.5.2-blue)
+![Version](https://img.shields.io/badge/Version-1.6.0-blue)
 ![Platform](https://img.shields.io/badge/Platform-Android%2016%20(API%2036)-3DDC84?logo=android)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.4.20-7F52FF?logo=kotlin)
 ![Compose](https://img.shields.io/badge/UI-Jetpack%20Compose%20%2B%20Material%203-4285F4?logo=jetpackcompose)
@@ -28,6 +28,18 @@
 - 1/3 档标准档位：光圈 f/1.0–f/32、ISO 25–102400，自动推荐最近的标准光圈并给出 EV 偏差
 - 高级修正：输出功率 1/1–1/128、闪光曝光补偿 ±3EV（1/3 档）
 - 实时提示与警告：距离过近/过远、光圈越界、ISO 过高、所需 GN 超范围、同步速度提醒
+
+### ISO 调节模式（v1.6.0）
+
+设置页可切换两种感光度调节方式（默认胶片模式）：
+
+- **胶片 ISO（6–1600）**：面向胶片摄影。ISO 6–9 以 **1** 连续递增，
+  更高区间吸附到标准胶片感光度 `10 / 16 / 20 / 25 / 50 / 64 / 80 / 100 / 125 / 160 /
+  200 / 250 / 400 / 500 / 640 / 800 / 1000 / 1250 / 1600`；
+  滑杆采用**对数刻度**，否则 ISO 100 以下会挤在轨道最左端 6% 内几乎无法拖动
+- **ISO 拓展（25–102400）**：沿用 1/3 档标准序列全范围调节
+- **「+ / -」步长 1 微调**：不受吸附限制，可在标准值之间取任意整数（如 ISO 320）
+- 切换模式时当前 ISO 立即夹取/吸附到新模式允许的范围，滑杆、数值与开关三者始终一致
 - 光圈 — 距离对照表
 - 米 / 英尺一键切换：**GN 与距离按 3.28084 同步换算**（GN 36 / 3 m ↔ GN 118 / 9.8 ft），物理量保持不变
 
@@ -82,20 +94,20 @@
 
 ## 下载安装
 
-从仓库的 **Releases** 页面下载最新版本 **v1.5.2**：
+从仓库的 **Releases** 页面下载最新版本 **v1.6.0**：
 
 | 文件 | 大小 | 说明 |
 | --- | --- | --- |
-| `GNCal-v1.5.2-release.apk` | 7.50 MB | 侧载安装用，V2 + V3 签名（含 v4 `.idsig`） |
-| `GNCal-v1.5.2-release.aab` | 19.54 MB | 含 code transparency 的 App Bundle |
+| `GNCal-v1.6.0-release.apk` | 7.50 MB | 侧载安装用，V2 + V3 签名（含 v4 `.idsig`） |
+| `GNCal-v1.6.0-release.aab` | 19.54 MB | 含 code transparency 的 App Bundle |
 | `transparency.cert` | < 1 KB | 代码透明度公钥证书，供独立校验 |
 
 ```
-APK SHA-256: EDCE6C12691675D942B6DA554D4BCAF5982598331411F098560F9B6D2FC6E09B
+APK SHA-256: 0F8F449E23067836F25380737507B906E1B8B32C738971998886A8844E67DBA3
 ```
 
 ```powershell
-adb install -r GNCal-v1.5.2-release.apk
+adb install -r GNCal-v1.6.0-release.apk
 ```
 
 | 项目 | 值 |
@@ -105,7 +117,7 @@ adb install -r GNCal-v1.5.2-release.apk
 | targetSdkVersion | **36（Android 16）** |
 | 权限 | **仅 `VIBRATE`（普通权限，安装即授予）** |
 | 签名证书 SHA-256 | `9493CBED…40EB458DB`（RSA 2048，永久固定） |
-| 历史版本 | v1.0.0（7.33 MB）、v1.1.0（7.36 MB）、v1.2.0（7.36 MB）、v1.3.0（7.38 MB）、v1.4.0（7.90 MB）、v1.4.1（7.48 MB）、v1.5.0（7.49 MB）、v1.5.1（7.49 MB） |
+| 历史版本 | v1.0.0（7.33 MB）、v1.1.0（7.36 MB）、v1.2.0（7.36 MB）、v1.3.0（7.38 MB）、v1.4.0（7.90 MB）、v1.4.1（7.48 MB）、v1.5.0（7.49 MB）、v1.5.1（7.49 MB）、v1.5.2（7.50 MB） |
 
 > 侧载安装的"Play 保护机制扫描"提示由设备端触发，开发者无法关闭；
 > 本项目通过完整签名方案、最小化权限（仅普通权限 `VIBRATE`）与可验证凭据把拦截概率降到最低。
@@ -165,6 +177,7 @@ app/src/main/res/
 
 ## 变更记录
 
+- [v1.6.0](../CHANGELOG-v1.6.0.md)：新增 ISO 调节模式（胶片 6–1600 吸附 / 全范围拓展）、±1 微调
 - [v1.5.2](../CHANGELOG-v1.5.2.md)：修复米/英尺切换不换算数值、GN 阈值未换算、档案 GN 单位脱节
 - [v1.5.1](../CHANGELOG-v1.5.1.md)：修复滑动时顶部按钮滞后、快速点按按钮卡顿与滑动掉帧
 - [v1.5.0](../CHANGELOG-v1.5.0.md)：触感反馈（开关 + 强度调节）、主页四页左右滑动切换

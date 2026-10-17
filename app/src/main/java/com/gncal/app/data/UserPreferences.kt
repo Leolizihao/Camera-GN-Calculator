@@ -26,6 +26,13 @@ enum class FontSizeMode { SYSTEM, COMPACT, LARGE }
 /** 配色方案。新增值必须追加在末尾，避免改变已存储用户的序号。 */
 enum class ColorPreset { AMBER, OCEAN, MINT, ROSE, FOREST, VIOLET, CORAL, SLATE }
 
+/**
+ * ISO 调节模式：
+ * - [FILM] 胶片 ISO——范围限制在 ISO 6–1600，按胶片常用感光度吸附（胶片极少用到 1600 以上）
+ * - [EXTENDED] ISO 拓展——全范围 ISO 25–102400，按 1/3 档序列调节
+ */
+enum class IsoMode { FILM, EXTENDED }
+
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "gncal_settings")
 
 /** 用户偏好（外观、语言、文字大小与单位），使用 Jetpack DataStore 持久化 */
@@ -41,6 +48,7 @@ class UserPreferencesRepository(private val context: Context) {
         val COLOR_PRESET = intPreferencesKey("color_preset")
         val HAPTIC_ENABLED = booleanPreferencesKey("haptic_enabled")
         val HAPTIC_INTENSITY = intPreferencesKey("haptic_intensity")
+        val ISO_MODE = intPreferencesKey("iso_mode")
         val FLASH_PROFILES = stringPreferencesKey("flash_profiles")
     }
 
@@ -76,6 +84,11 @@ class UserPreferencesRepository(private val context: Context) {
 
     val hapticIntensity: Flow<Int> = context.dataStore.data.map { prefs ->
         (prefs[Keys.HAPTIC_INTENSITY] ?: 55).coerceIn(0, 100)
+    }
+
+    val isoMode: Flow<IsoMode> = context.dataStore.data.map { prefs ->
+        val ordinal = prefs[Keys.ISO_MODE] ?: IsoMode.FILM.ordinal
+        IsoMode.entries.getOrElse(ordinal) { IsoMode.FILM }
     }
 
     val flashProfiles: Flow<List<FlashProfile>> = context.dataStore.data.map { prefs ->
@@ -116,6 +129,10 @@ class UserPreferencesRepository(private val context: Context) {
 
     suspend fun setHapticIntensity(intensity: Int) {
         context.dataStore.edit { it[Keys.HAPTIC_INTENSITY] = intensity.coerceIn(0, 100) }
+    }
+
+    suspend fun setIsoMode(mode: IsoMode) {
+        context.dataStore.edit { it[Keys.ISO_MODE] = mode.ordinal }
     }
 
     suspend fun addFlashProfile(name: String, guideNumber: Double) {

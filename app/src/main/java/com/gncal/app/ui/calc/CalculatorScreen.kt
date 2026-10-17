@@ -40,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.gncal.app.R
+import com.gncal.app.data.IsoMode
 import com.gncal.app.model.Advice
 import com.gncal.app.model.CalcResult
 import com.gncal.app.model.DistanceUnit
@@ -59,7 +60,7 @@ private val CalculatorStateSaver = mapSaver(
             "gn" to it.gnText,
             "aperture" to it.apertureIndex,
             "distance" to it.distanceText,
-            "iso" to it.isoIndex,
+            "iso" to it.isoValue,
             "power" to it.powerIndex,
             "comp" to it.compensationIndex,
             "advanced" to if (it.advancedExpanded) 1 else 0
@@ -72,8 +73,14 @@ private val CalculatorStateSaver = mapSaver(
             apertureIndex = ((map["aperture"] as? Int) ?: PhotoScales.DEFAULT_APERTURE_INDEX)
                 .coerceIn(PhotoScales.APERTURES.indices)
             distanceText = (map["distance"] as? String) ?: "3"
-            isoIndex = ((map["iso"] as? Int) ?: PhotoScales.DEFAULT_ISO_INDEX)
-                .coerceIn(PhotoScales.ISOS.indices)
+            // 旧版本保存的是 1/3 档序列下标（0..36），这里迁移为真实 ISO 数值
+            isoValue = ((map["iso"] as? Int) ?: PhotoScales.DEFAULT_ISO).let { raw ->
+                if (raw in PhotoScales.ISOS.indices && raw < PhotoScales.ISOS.first()) {
+                    PhotoScales.ISOS[raw]
+                } else {
+                    raw.coerceIn(PhotoScales.FILM_MIN_ISO, PhotoScales.ISOS.last())
+                }
+            }
             powerIndex = ((map["power"] as? Int) ?: 0)
                 .coerceIn(PhotoScales.POWER_DENOMINATORS.indices)
             compensationIndex = ((map["comp"] as? Int) ?: PhotoScales.DEFAULT_COMP_INDEX)
@@ -88,7 +95,8 @@ class CalculatorState {
     var gnText by mutableStateOf("36")
     var apertureIndex by mutableStateOf(PhotoScales.DEFAULT_APERTURE_INDEX)
     var distanceText by mutableStateOf("3")
-    var isoIndex by mutableStateOf(PhotoScales.DEFAULT_ISO_INDEX)
+    /** 感光度真实数值（ISO 6–102400，胶片模式下限制在 6–1600） */
+    var isoValue by mutableStateOf(PhotoScales.DEFAULT_ISO)
     var powerIndex by mutableStateOf(0)
     var compensationIndex by mutableStateOf(PhotoScales.DEFAULT_COMP_INDEX)
     var advancedExpanded by mutableStateOf(false)
@@ -98,7 +106,7 @@ class CalculatorState {
         gnText = "36"
         apertureIndex = PhotoScales.DEFAULT_APERTURE_INDEX
         distanceText = "3"
-        isoIndex = PhotoScales.DEFAULT_ISO_INDEX
+        isoValue = PhotoScales.DEFAULT_ISO
         powerIndex = 0
         compensationIndex = PhotoScales.DEFAULT_COMP_INDEX
     }
@@ -117,6 +125,17 @@ class CalculatorState {
             gnText = FlashCalculator.formatGuideNumber(from.convert(it, to))
         }
     }
+
+    /**
+     * 切换 ISO 调节模式时把数值夹取/吸附到新模式允许的范围，
+     * 保证滑杆、数值与设置开关三者始终一致（例如 6400 切到胶片模式应落到 1600）。
+     */
+    fun applyIsoMode(mode: IsoMode) {
+        isoValue = when (mode) {
+            IsoMode.FILM -> PhotoScales.snapFilmIso(isoValue.toFloat())
+            IsoMode.EXTENDED -> PhotoScales.nearestIso(isoValue.toDouble())
+        }
+    }
 }
 
 @Composable
@@ -133,6 +152,8 @@ fun CalculatorScreen(
     state: CalculatorState = rememberCalculatorState(),
     /** 当前页对应的求解模式（由外层 Pager 指定），输入值在四个页面间共享 */
     mode: SolveMode,
+    /** ISO 调节模式：决定感光度滑杆的范围与吸附规则 */
+    isoMode: IsoMode,
     modifier: Modifier = Modifier
 ) {
     val gn = state.gnText.toDoubleOrNull()?.takeIf { it > 0.0 }
@@ -143,7 +164,7 @@ fun CalculatorScreen(
         gnIso100 = gn ?: 0.0,
         apertureIndex = state.apertureIndex,
         distance = distance ?: 0.0,
-        isoIndex = state.isoIndex,
+        iso = state.isoValue,
         powerIndex = state.powerIndex,
         compensationIndex = state.compensationIndex,
         unit = unit
@@ -165,7 +186,8 @@ fun CalculatorScreen(
                     unit = unit,
                     flashProfiles = flashProfiles,
                     onUnitChange = onUnitChange,
-                    mode = mode
+                    mode = mode,
+                    isoMode = isoMode
                 )
             }
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -186,7 +208,8 @@ fun CalculatorScreen(
                 unit = unit,
                 flashProfiles = flashProfiles,
                 onUnitChange = onUnitChange,
-                mode = mode
+                mode = mode,
+                isoMode = isoMode
             )
             ResultsPane(inputs = inputs, result = result, unit = unit)
         }
@@ -217,6 +240,7 @@ private fun InputsPane(
     flashProfiles: List<FlashProfile>,
     onUnitChange: (DistanceUnit) -> Unit,
     mode: SolveMode,
+    isoMode: IsoMode,
     modifier: Modifier = Modifier
 ) {
     val solvedLabel = stringResource(R.string.label_solved)
@@ -307,16 +331,44 @@ private fun InputsPane(
             }
 
             // ISO
-            SteppedSliderRow(
-                label = stringResource(R.string.label_iso),
-                valueLabel = PhotoScales.ISOS[state.isoIndex].toString(),
-                value = state.isoIndex.toFloat(),
-                valueRange = 0f..(PhotoScales.ISOS.size - 1).toFloat(),
-                steps = PhotoScales.ISOS.size - 2,
-                onValueChange = { state.isoIndex = it.toInt() },
-                enabled = mode != SolveMode.ISO,
-                caption = if (mode == SolveMode.ISO) solvedLabel else null
-            )
+            if (isoMode == IsoMode.FILM) {
+                // 胶片模式：滑杆走对数刻度，6–9 按 1 连续，其余吸附到标准胶片感光度；
+                // 「+ / -」不被吸附，可在标准值之间做步长 1 的精确微调
+                SteppedSliderRow(
+                    label = stringResource(R.string.label_iso),
+                    valueLabel = state.isoValue.toString(),
+                    value = PhotoScales.filmIsoPosition(state.isoValue.toFloat()),
+                    valueRange = 0f..100f,
+                    steps = 0,
+                    hapticStep = 1f,
+                    onValueChange = {
+                        state.isoValue = PhotoScales.snapFilmIso(PhotoScales.filmIsoFromPosition(it))
+                    },
+                    onStep = { delta ->
+                        state.isoValue = (state.isoValue + delta)
+                            .coerceIn(PhotoScales.FILM_MIN_ISO, PhotoScales.FILM_MAX_ISO)
+                    },
+                    enabled = mode != SolveMode.ISO,
+                    caption = if (mode == SolveMode.ISO) solvedLabel else null
+                )
+            } else {
+                // 拓展模式：沿用 1/3 档标准序列，按序列下标滑动
+                val isoIndex = PhotoScales.ISOS.indexOf(state.isoValue)
+                    .takeIf { it >= 0 }
+                    ?: PhotoScales.ISOS.indexOf(PhotoScales.nearestIso(state.isoValue.toDouble()))
+                SteppedSliderRow(
+                    label = stringResource(R.string.label_iso),
+                    valueLabel = PhotoScales.ISOS[isoIndex].toString(),
+                    value = isoIndex.toFloat(),
+                    valueRange = 0f..(PhotoScales.ISOS.size - 1).toFloat(),
+                    steps = PhotoScales.ISOS.size - 2,
+                    onValueChange = {
+                        state.isoValue = PhotoScales.ISOS[it.toInt().coerceIn(PhotoScales.ISOS.indices)]
+                    },
+                    enabled = mode != SolveMode.ISO,
+                    caption = if (mode == SolveMode.ISO) solvedLabel else null
+                )
+            }
         }
 
         SectionCard {

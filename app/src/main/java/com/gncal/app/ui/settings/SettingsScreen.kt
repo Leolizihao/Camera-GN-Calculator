@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import com.gncal.app.R
 import com.gncal.app.data.ColorPreset
 import com.gncal.app.data.FontSizeMode
+import com.gncal.app.data.IsoMode
 import com.gncal.app.data.LanguageMode
 import com.gncal.app.data.ThemeMode
 import com.gncal.app.model.DistanceUnit
@@ -61,6 +62,7 @@ fun SettingsScreen(
     language: LanguageMode,
     fontSize: FontSizeMode,
     colorPreset: ColorPreset,
+    isoMode: IsoMode = IsoMode.FILM,
     hapticEnabled: Boolean = true,
     hapticIntensity: Int = 55,
     flashProfiles: List<FlashProfile>,
@@ -69,6 +71,7 @@ fun SettingsScreen(
     onLanguageChange: (LanguageMode) -> Unit,
     onFontSizeChange: (FontSizeMode) -> Unit,
     onColorPresetChange: (ColorPreset) -> Unit,
+    onIsoModeChange: (IsoMode) -> Unit = {},
     onHapticEnabledChange: (Boolean) -> Unit = {},
     onHapticIntensityChange: (Int) -> Unit = {},
     onAddFlashProfile: (String, Double) -> Unit,
@@ -135,6 +138,20 @@ fun SettingsScreen(
                         },
                         selected = fontSize == mode,
                         onClick = { onFontSizeChange(mode) }
+                    )
+                }
+            }
+
+            // ISO range
+            SectionCard(title = stringResource(R.string.settings_iso_mode)) {
+                IsoMode.entries.forEach { mode ->
+                    SettingRow(
+                        label = when (mode) {
+                            IsoMode.FILM -> stringResource(R.string.iso_mode_film)
+                            IsoMode.EXTENDED -> stringResource(R.string.iso_mode_extended)
+                        },
+                        selected = isoMode == mode,
+                        onClick = { onIsoModeChange(mode) }
                     )
                 }
             }

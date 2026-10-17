@@ -3,6 +3,7 @@ package com.gncal.app.model
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.log2
+import kotlin.math.ln
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
@@ -54,9 +55,50 @@ object PhotoScales {
     /** 闪光曝光补偿：-3EV … +3EV，步长 1/3 EV */
     val COMPENSATION_EV: List<Double> = (-9..9).map { it / 3.0 }
 
+    /**
+     * 胶片模式的标准感光离散值。个位数区间（6–9）以 1 连续递增，
+     * 其后一律吸附到这些胶片常用感光度上。
+     */
+    val FILM_ISO_STOPS: List<Int> = listOf(
+        10, 16, 20, 25, 50, 64, 80, 100, 125, 160, 200, 250, 400, 500, 640, 800, 1000, 1250, 1600
+    )
+
+    /** 胶片模式允许的 ISO 下限（个位数起点）与上限 */
+    const val FILM_MIN_ISO: Int = 6
+    const val FILM_MAX_ISO: Int = 1600
+
     val DEFAULT_APERTURE_INDEX: Int = APERTURES.indexOf(5.6)
     val DEFAULT_ISO_INDEX: Int = ISOS.indexOf(400)
+    val DEFAULT_ISO: Int = 400
     val DEFAULT_COMP_INDEX: Int = COMPENSATION_EV.indexOf(0.0)
+
+    /**
+     * 胶片模式滑动取值：个位数区间按 1 取整，其余吸附到 [FILM_ISO_STOPS] 中
+     * 对数距离最近的标准值（ISO 按倍率等比分布，比较必须用比值而非差值）。
+     */
+    fun snapFilmIso(value: Float): Int {
+        val v = value.coerceIn(FILM_MIN_ISO.toFloat(), FILM_MAX_ISO.toFloat())
+        if (v <= 9f) return v.roundToInt()
+        return FILM_ISO_STOPS.minByOrNull { abs(log2(it.toDouble() / v)) } ?: FILM_MAX_ISO
+    }
+
+    /**
+     * 感光度在对数刻度上的位置（0–100）。
+     * 6–1600 若按线性铺在滑杆上，ISO 100 以下会挤在最左侧 6% 内几乎无法拖动，
+     * 胶片感光度本身按倍率分布，因此滑杆必须用对数刻度。
+     */
+    fun filmIsoPosition(value: Float): Float {
+        val v = value.coerceIn(FILM_MIN_ISO.toFloat(), FILM_MAX_ISO.toFloat())
+        val ratio = ln(v.toDouble() / FILM_MIN_ISO) /
+            ln(FILM_MAX_ISO.toDouble() / FILM_MIN_ISO)
+        return (ratio * 100.0).coerceIn(0.0, 100.0).toFloat()
+    }
+
+    /** [filmIsoPosition] 的逆运算：由滑杆位置还原感光度数值 */
+    fun filmIsoFromPosition(position: Float): Float {
+        val p = position.coerceIn(0f, 100f) / 100.0
+        return (FILM_MIN_ISO * (FILM_MAX_ISO.toDouble() / FILM_MIN_ISO).pow(p)).toFloat()
+    }
 
     fun nearestAperture(value: Double): Double =
         APERTURES.minByOrNull { abs(2.0 * log2(value / it)) } ?: value
@@ -77,13 +119,13 @@ data class FlashInputs(
     val gnIso100: Double = 36.0,
     val apertureIndex: Int = PhotoScales.DEFAULT_APERTURE_INDEX,
     val distance: Double = 3.0,
-    val isoIndex: Int = PhotoScales.DEFAULT_ISO_INDEX,
+    /** 感光度真实数值（不再用下标：胶片模式需要 6–9 以及标准值之间的任意整数） */
+    val iso: Int = PhotoScales.DEFAULT_ISO,
     val powerIndex: Int = 0,
     val compensationIndex: Int = PhotoScales.DEFAULT_COMP_INDEX,
     val unit: DistanceUnit = DistanceUnit.METER
 ) {
     val aperture: Double get() = PhotoScales.APERTURES[apertureIndex.coerceIn(PhotoScales.APERTURES.indices)]
-    val iso: Int get() = PhotoScales.ISOS[isoIndex.coerceIn(PhotoScales.ISOS.indices)]
 
     /** 输出功率折算成 EV（1/2 功率 = -1 EV） */
     val powerEv: Double

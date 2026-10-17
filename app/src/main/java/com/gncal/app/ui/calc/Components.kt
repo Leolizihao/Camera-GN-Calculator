@@ -119,14 +119,25 @@ fun SteppedSliderRow(
     valueRange: ClosedFloatingPointRange<Float>,
     steps: Int,
     onValueChange: (Float) -> Unit,
+    /**
+     * 「+ / -」按钮的方向回调（-1 减、+1 加）。
+     * 提供时优先于按滑杆取值步进，用于「按真实数值步长 1 微调」的场景
+     * （胶片 ISO 的滑杆是对数刻度，无法靠 value ± 1 得到 ISO ± 1）。
+     */
+    onStep: ((Int) -> Unit)? = null,
+    /** 触发触感所需的数值变化量；不传时按档位间隔推算 */
+    hapticStep: Float = 0f,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     caption: String? = null
 ) {
     val haptics = LocalHaptics.current
     // 每跨过一个档位（连续滑杆则每跨过一个整数单位）给一次轻微触感，避免拖动手抖式连震
-    val stepSize = ((valueRange.endInclusive - valueRange.start) / (steps + 1))
-        .takeIf { it > 0f } ?: 1f
+    val stepSize = if (hapticStep > 0f) {
+        hapticStep
+    } else {
+        ((valueRange.endInclusive - valueRange.start) / (steps + 1)).takeIf { it > 0f } ?: 1f
+    }
     var lastTickValue by remember(valueRange, steps) { mutableFloatStateOf(value) }
     val tickIfNeeded: (Float) -> Unit = { next ->
         if (abs(next - lastTickValue) >= stepSize - 0.0001f) {
@@ -157,9 +168,14 @@ fun SteppedSliderRow(
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(
                 onClick = {
-                    val next = (value - 1).coerceIn(valueRange)
-                    tickIfNeeded(next)
-                    onValueChange(next)
+                    if (onStep != null) {
+                        haptics.perform(HapticEvent.TICK)
+                        onStep(-1)
+                    } else {
+                        val next = (value - 1).coerceIn(valueRange)
+                        tickIfNeeded(next)
+                        onValueChange(next)
+                    }
                 },
                 enabled = enabled
             ) {
@@ -183,9 +199,14 @@ fun SteppedSliderRow(
             )
             IconButton(
                 onClick = {
-                    val next = (value + 1).coerceIn(valueRange)
-                    tickIfNeeded(next)
-                    onValueChange(next)
+                    if (onStep != null) {
+                        haptics.perform(HapticEvent.TICK)
+                        onStep(1)
+                    } else {
+                        val next = (value + 1).coerceIn(valueRange)
+                        tickIfNeeded(next)
+                        onValueChange(next)
+                    }
                 },
                 enabled = enabled
             ) {
