@@ -102,6 +102,21 @@ class CalculatorState {
         powerIndex = 0
         compensationIndex = PhotoScales.DEFAULT_COMP_INDEX
     }
+
+    /**
+     * 切换单位时换算已输入的 GN 与距离，保证**物理量不变**。
+     * 只换单位标签而不换算数值会让 GN 36（米制）变成 GN 36（英制），
+     * 二者实际相差 3.28 倍，计算结果会完全错误。
+     */
+    fun convertUnit(from: DistanceUnit, to: DistanceUnit) {
+        if (from == to) return
+        distanceText.toDoubleOrNull()?.let {
+            distanceText = FlashCalculator.formatDistance(from.convert(it, to))
+        }
+        gnText.toDoubleOrNull()?.let {
+            gnText = FlashCalculator.formatGuideNumber(from.convert(it, to))
+        }
+    }
 }
 
 @Composable
@@ -234,7 +249,13 @@ private fun InputsPane(
                 FlashProfilePicker(
                     profiles = flashProfiles,
                     selectedGuideNumber = state.gnText.toDoubleOrNull(),
-                    onProfileSelected = { state.gnText = FlashCalculator.formatGuideNumber(it.guideNumber) }
+                    unit = unit,
+                    onProfileSelected = { profile ->
+                        // 档案里的 GN 统一以米制保存，选中时换算到当前单位
+                        state.gnText = FlashCalculator.formatGuideNumber(
+                            DistanceUnit.METER.convert(profile.guideNumber, unit)
+                        )
+                    }
                 )
                 NumberField(
                     label = stringResource(R.string.label_gn),
@@ -354,12 +375,16 @@ private fun InputsPane(
 private fun FlashProfilePicker(
     profiles: List<FlashProfile>,
     selectedGuideNumber: Double?,
+    unit: DistanceUnit,
     onProfileSelected: (FlashProfile) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+    // 档案 GN 以米制保存，与当前输入比对前先换算到当前单位。
+    // 容差取 0.6：输入框按整数/一位小数格式化，换算回读会有舍入误差。
     val selected = profiles.firstOrNull { profile ->
-        selectedGuideNumber != null && kotlin.math.abs(profile.guideNumber - selectedGuideNumber) < 0.0001
+        val inCurrentUnit = DistanceUnit.METER.convert(profile.guideNumber, unit)
+        selectedGuideNumber != null && kotlin.math.abs(inCurrentUnit - selectedGuideNumber) < 0.6
     }
 
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -386,7 +411,9 @@ private fun FlashProfilePicker(
                         )
                         if (selected != null) {
                             Text(
-                                text = "GN ${FlashCalculator.formatGuideNumber(selected.guideNumber)}",
+                                text = "GN ${FlashCalculator.formatGuideNumber(
+                                    DistanceUnit.METER.convert(selected.guideNumber, unit)
+                                )} ${unit.symbol}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Start
@@ -409,7 +436,9 @@ private fun FlashProfilePicker(
                             Column {
                                 Text(profile.name)
                                 Text(
-                                    text = "GN ${FlashCalculator.formatGuideNumber(profile.guideNumber)}",
+                                    text = "GN ${FlashCalculator.formatGuideNumber(
+                                        DistanceUnit.METER.convert(profile.guideNumber, unit)
+                                    )} ${unit.symbol}",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )

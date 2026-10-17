@@ -253,8 +253,12 @@ private fun GnCalAppContent(preferences: UserPreferencesRepository, modifier: Mo
                 CalculatorScreen(
                     unit = unit,
                     onUnitChange = { newUnit ->
-                        if (newUnit != unit) haptics.perform(HapticEvent.SELECT)
-                        scope.launch { preferences.setDistanceUnit(newUnit) }
+                        if (newUnit != unit) {
+                            haptics.perform(HapticEvent.SELECT)
+                            // 先换算已输入的 GN 与距离，再切换单位，保证物理量不变
+                            calculatorState.convertUnit(from = unit, to = newUnit)
+                            scope.launch { preferences.setDistanceUnit(newUnit) }
+                        }
                     },
                     flashProfiles = flashProfiles,
                     expandedLayout = expandedLayout,

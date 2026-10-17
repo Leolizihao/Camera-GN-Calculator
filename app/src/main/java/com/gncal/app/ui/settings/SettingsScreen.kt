@@ -46,6 +46,7 @@ import com.gncal.app.data.ColorPreset
 import com.gncal.app.data.FontSizeMode
 import com.gncal.app.data.LanguageMode
 import com.gncal.app.data.ThemeMode
+import com.gncal.app.model.DistanceUnit
 import com.gncal.app.model.FlashCalculator
 import com.gncal.app.model.FlashProfile
 import com.gncal.app.ui.calc.SectionCard
@@ -407,7 +408,10 @@ private fun FlashProfileEditorDialog(
                                 } else text
                             }
                     },
-                    label = { Text(stringResource(R.string.label_flash_gn)) },
+                    label = {
+                        // 档案 GN 统一以米制保存，标明单位避免误填英制数值
+                        Text("${stringResource(R.string.label_flash_gn)}（${DistanceUnit.METER.symbol}）")
+                    },
                     placeholder = { Text(stringResource(R.string.hint_flash_gn)) },
                     singleLine = true,
                     isError = guideNumberText.isNotEmpty() && guideNumber == null,

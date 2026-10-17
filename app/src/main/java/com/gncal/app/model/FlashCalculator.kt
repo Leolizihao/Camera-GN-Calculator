@@ -4,6 +4,7 @@ import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.log2
 import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 /**
@@ -23,6 +24,12 @@ enum class DistanceUnit(val metersPerUnit: Double, val symbol: String) {
 
     fun fromMeters(value: Double): Double = value / metersPerUnit
     fun toMeters(value: Double): Double = value * metersPerUnit
+
+    /**
+     * 把「以本单位为基准」的数值换算到 [to] 单位。
+     * 距离与 GN 同为长度量纲，都按同一系数线性换算（GN_ft = GN_m × 3.28084）。
+     */
+    fun convert(value: Double, to: DistanceUnit): Double = value * metersPerUnit / to.metersPerUnit
 }
 
 object PhotoScales {
@@ -196,8 +203,12 @@ object FlashCalculator {
                 val gn = inputs.aperture * inputs.distance / gainFactor(inputs)
                 primary = formatGuideNumber(gn)
                 detail = "ISO 100 · ${unit.symbol}"
-                if (gn > GN_LARGE_THRESHOLD) advices += Advice.GnTooLarge(GN_LARGE_THRESHOLD)
-                if (gn < GN_SMALL_THRESHOLD) advices += Advice.GnTooSmall(GN_SMALL_THRESHOLD)
+                // 阈值定义在米制下，必须换算到当前单位后再比较，
+                // 否则英制下 GN 118（= 36 m）会被误报为「GN 过大」
+                val gnLarge = unit.fromMeters(GN_LARGE_THRESHOLD.toDouble()).roundToInt()
+                val gnSmall = unit.fromMeters(GN_SMALL_THRESHOLD.toDouble()).roundToInt()
+                if (gn > gnLarge) advices += Advice.GnTooLarge(gnLarge)
+                if (gn < gnSmall) advices += Advice.GnTooSmall(gnSmall)
                 checkDistance(advices, inputs.distance, effGn, unit)
             }
 
